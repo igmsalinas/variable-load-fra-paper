@@ -1,0 +1,10 @@
+Parameter,Symbol,Nominal Value,Healthy Tolerance Band,Degraded Fault Band(s),Physical Role / Aging Mechanism
+Input voltage,$V_{\mathrm{in}}$,"$50.0\,\mathrm{V}$",Fixed,—,Regulated DC bus
+Duty cycle / Switching freq.,"$D,\, f_s$","$0.40,\, 100\,\mathrm{kHz}$","Fixed ($t_{\mathrm{dead}} = 100\,\mathrm{ns}$)",—,Complementary PWM excitation
+Output capacitance,$C_{\mathrm{out}}$,"$100\,\mu\mathrm{F}$","$\pm 7.5\%$ ($[92.5, 107.5]\,\mu\mathrm{F}$)","$[-45\%, -15\%] \cup [+15\%, +45\%]$",Dielectric loss / film capacitance drift
+Capacitor ESR,$\mathrm{ESR}_C$,"$20\,\mathrm{m}\Omega$","$\pm 20\%$ ($[16.0, 24.0]\,\mathrm{m}\Omega$)","$[+50\%, +200\%]$ ($[30, 60]\,\mathrm{m}\Omega$)",Electrolyte dry-out / contact aging
+Filter inductance,$L_{\mathrm{out}}$,"$200\,\mu\mathrm{H}$","$\pm 7.5\%$ ($[185.0, 215.0]\,\mu\mathrm{H}$)","$[-45\%, -15\%] \cup [+15\%, +45\%]$",Core permeability drift / partial saturation
+Inductor ESR,$\mathrm{ESR}_L$,"$100\,\mathrm{m}\Omega$","$\pm 27.5\%$ ($[72.5, 127.5]\,\mathrm{m}\Omega$)","$[+50\%, +200\%]$ ($[150, 300]\,\mathrm{m}\Omega$)",Winding/solder contact degradation
+High-side MOSFET $R_{\mathrm{ds(on)}}$,"$R_{\mathrm{ds},1}$","$10\,\mathrm{m}\Omega$","$\pm 27.5\%$ ($[7.25, 12.75]\,\mathrm{m}\Omega$)","$[+80\%, +560\%]$ ($[18, 66]\,\mathrm{m}\Omega$)",Bond-wire lift / thermal die fatigue
+Sync-rectifier MOSFET $R_{\mathrm{ds(on)}}$,"$R_{\mathrm{ds},2}$","$10\,\mathrm{m}\Omega$",Clamped in PSIM,Unobservable via $V_{\mathrm{out}}$ FRA,Clamped by antiparallel body diode (Sec. 3.3)
+Operating load resistance,$R_{\mathrm{out}}$,"$4.0\,\Omega$","$[-50\%, +100\%]$ ($[2.0, 8.0]\,\Omega$)","$[-50\%, +100\%]$ ($[2.0, 8.0]\,\Omega$)","Legitimate $4\times$ load variation ($2.5\text{--}10\,\mathrm{A}$)"

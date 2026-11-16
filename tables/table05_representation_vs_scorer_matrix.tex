@@ -1,0 +1,17 @@
+\begin{table*}[t]
+\centering
+\caption{Representation-versus-scorer control matrix on \texttt{dataset\_02} (10 seeds, zero-label \texttt{p97.5} F1 and $\mathrm{PR\text{-}AUC}_{\pi=0.05}$).}
+\label{tab:representation_vs_scorer}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccccc}
+\toprule
+Learned Representation (10 Seeds) & \texttt{k-NN (k=5)} $\mathrm{F1}_{\mathrm{p97.5}}$ & \texttt{Ledoit-Wolf} $\mathrm{F1}_{\mathrm{p97.5}}$ & \texttt{PCA (d=5)} $\mathrm{F1}_{\mathrm{p97.5}}$ & \texttt{PCA (d=10)} $\mathrm{F1}_{\mathrm{p97.5}}$ & \texttt{k-NN (k=5)} $\mathrm{PR\text{-}AUC}_{\pi=0.05}$ & \texttt{Ledoit-Wolf} $\mathrm{PR\text{-}AUC}_{\pi=0.05}$ \\
+\midrule
+\texttt{AE-Transformer} ($\mathbf{h}$, $w_c=0$) & 0.7090 $\pm$ 0.0067 & 0.7671 $\pm$ 0.0289 & 0.8293 $\pm$ 0.0597 & 0.9373 $\pm$ 0.0208 & 0.6129 $\pm$ 0.0053 & 0.6662 $\pm$ 0.0324 \\
+\texttt{CARLA (Heuristic)} ($\mathbf{z}$) & 0.6868 $\pm$ 0.0281 & 0.8042 $\pm$ 0.0247 & 0.6674 $\pm$ 0.0606 & 0.7343 $\pm$ 0.0425 & 0.5271 $\pm$ 0.0530 & 0.6902 $\pm$ 0.0470 \\
+\textbf{\texttt{CARLA (SSA)} Latent ($\mathbf{h}$)} & \textbf{0.9296 $\pm$ 0.0203} & \textbf{0.9421 $\pm$ 0.0037} & \textbf{0.9502 $\pm$ 0.0036} & \textbf{0.9204 $\pm$ 0.0188} & \textbf{0.8898 $\pm$ 0.0182} & \textbf{0.8620 $\pm$ 0.0064} \\
+\textbf{\texttt{CARLA (SSA)} Projection ($\mathbf{z}$)} & \textbf{0.9415 $\pm$ 0.0125} & \textbf{0.9504 $\pm$ 0.0109} & \textbf{0.9351 $\pm$ 0.0129} & \textbf{0.9474 $\pm$ 0.0121} & \textbf{0.9126 $\pm$ 0.0304} & \textbf{0.9188 $\pm$ 0.0237} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}

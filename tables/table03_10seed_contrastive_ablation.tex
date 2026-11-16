@@ -1,0 +1,17 @@
+\begin{table*}[t]
+\centering
+\caption{10-seed paired ablation of objective formulation and negative-sampling physics on \texttt{dataset\_02} under identical \texttt{Transformer} backbones and strict zero-label \texttt{p97.5} calibration ($p_{\min} = 0.00195$ for $n=10$).}
+\label{tab:10seed_ablation}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccccccc}
+\toprule
+Training \& Scoring Regime & $\mathrm{F1}_{\mathrm{p97.5}}$ & $\mathrm{PR\text{-}AUC}_{\pi=0.05}$ & $\mathrm{ROC\text{-}AUC}$ & Passive Single Rec. & $\mathrm{ESR}_C$ Rec. & $\mathrm{ESR}_L$ Rec. & $R_{\mathrm{ds},1}$ Rec. & Paired $\Delta\mathrm{F1}$ ($p$-value) \\
+\midrule
+\texttt{AE-Transformer (MSE, w\_c=0)} & 0.7540 $\pm$ 0.0111 & 0.6640 $\pm$ 0.0153 & 0.9033 $\pm$ 0.0129 & 51.7\% $\pm$ 2.0\% & 13.2\% $\pm$ 2.9\% & 9.5\% $\pm$ 6.3\% & 3.2\% $\pm$ 2.7\% & $+0.1876$ ($p = 0.00195$) \\
+\texttt{AE-Transformer (Latent kNN5)} & 0.7090 $\pm$ 0.0067 & 0.6129 $\pm$ 0.0053 & 0.8190 $\pm$ 0.0114 & 45.4\% $\pm$ 0.7\% & 3.6\% $\pm$ 0.0\% & 4.8\% $\pm$ 0.0\% & 1.1\% $\pm$ 2.2\% & $+0.2327$ ($p = 0.00195$) \\
+\texttt{CARLA-Transformer (Heuristic)} & 0.6868 $\pm$ 0.0281 & 0.5272 $\pm$ 0.0529 & 0.8344 $\pm$ 0.0224 & 45.7\% $\pm$ 3.8\% & 17.1\% $\pm$ 4.4\% & 5.2\% $\pm$ 3.5\% & 6.8\% $\pm$ 3.6\% & $+0.2548$ ($p = 0.00195$) \\
+\textbf{\texttt{CARLA-Transformer (SSA)}} & \textbf{0.9417 $\pm$ 0.0128} & \textbf{0.9126 $\pm$ 0.0308} & \textbf{0.9740 $\pm$ 0.0064} & \textbf{93.3\% $\pm$ 2.2\%} & \textbf{89.6\% $\pm$ 7.2\%} & \textbf{92.4\% $\pm$ 4.0\%} & \textbf{36.3\% $\pm$ 10.4\%} & --- \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}

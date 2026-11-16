@@ -1,0 +1,18 @@
+\begin{table*}[t]
+\centering
+\caption{5-architecture encoder backbone comparison under identical \texttt{CARLA (SSA)} nominal-load physics training and strict zero-label \texttt{p97.5} calibration on \texttt{dataset\_02} (5 paired seeds, mean $\pm$ SD; median in brackets for bimodal \texttt{GRU}).}
+\label{tab:encoder_backbones}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccccc}
+\toprule
+Encoder Backbone & $\mathrm{F1}_{\mathrm{p97.5}}$ (Clean) & $\mathrm{PR\text{-}AUC}_{\pi=0.05}$ & $\mathrm{ROC\text{-}AUC}$ & $\mathrm{F1}_{\mathrm{p97.5}}$ ($0.15\,\mathrm{dB}$ FRA) & $\mathrm{ESR}_C$ Rec. & $\mathrm{ESR}_L$ Rec. & $R_{\mathrm{ds},1}$ Rec. \\
+\midrule
+\textbf{\texttt{Transformer} (Self-Attention)} & \textbf{0.9447 $\pm$ 0.0133} & \textbf{0.9195 $\pm$ 0.0283} & \textbf{0.9733 $\pm$ 0.0069} & \textbf{0.9303 $\pm$ 0.0087} & \textbf{90.0\% $\pm$ 9.2\%} & \textbf{94.3\% $\pm$ 2.1\%} & \textbf{38.9\% $\pm$ 8.0\%} \\
+\texttt{LSTM} (Recurrent) & 0.8611 $\pm$ 0.0144 & 0.8053 $\pm$ 0.0100 & 0.9254 $\pm$ 0.0033 & 0.8557 $\pm$ 0.0165 & 84.3\% $\pm$ 11.5\% & 24.8\% $\pm$ 4.0\% & 7.4\% $\pm$ 4.7\% \\
+\texttt{Conv1D} (Local Kernel) & 0.8426 $\pm$ 0.0238 & 0.7440 $\pm$ 0.0099 & 0.9188 $\pm$ 0.0083 & 0.7451 $\pm$ 0.0165 & 53.6\% $\pm$ 13.4\% & 50.5\% $\pm$ 19.2\% & 3.2\% $\pm$ 4.7\% \\
+\texttt{MLP} (Dense Flattened) & 0.7739 $\pm$ 0.0210 & 0.7227 $\pm$ 0.0322 & 0.9095 $\pm$ 0.0118 & 0.7506 $\pm$ 0.0207 & 30.0\% $\pm$ 10.6\% & 17.1\% $\pm$ 12.0\% & 6.3\% $\pm$ 6.9\% \\
+\texttt{GRU} (Gated Recurrent) & 0.5988 $\pm$ 0.3207 [0.8164] & 0.5147 $\pm$ 0.3052 [0.6958] & 0.7904 $\pm$ 0.1128 [0.8632] & 0.6021 $\pm$ 0.2965 [0.7910] & 60.7\% $\pm$ 52.2\% & 7.6\% $\pm$ 5.4\% & 3.2\% $\pm$ 4.7\% \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
