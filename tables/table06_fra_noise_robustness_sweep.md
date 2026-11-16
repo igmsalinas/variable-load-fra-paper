@@ -9,4 +9,4 @@
 | `Mahalanobis (Ledoit-Wolf)` | 0.8992 | 0.8783 | 0.8122 | 0.7240 | 0.6749 | 0.5646 | 0.4509 |
 | `Raw k-NN (k=5)` | 0.7112 | 0.7112 | 0.7112 | 0.7112 | 0.7091 | 0.7073 | 0.6991 |
 
-*On the primary matched 0.15 dB calibration realization (Fig. 6a), CARLA-Transformer (SSA) achieves F1 = 0.9284 ± 0.0154.*
+*On the primary matched 0.15 dB calibration realization (Fig. 7a), CARLA-Transformer (SSA) achieves F1 = 0.9284 ± 0.0154.*

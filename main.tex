@@ -12,6 +12,7 @@
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
 \graphicspath{{figures/}}
+\emergencystretch=1.5em
 
 \title{Disentangling Component Degradation from Operating-Load Variations in Power-Converter Frequency Responses via Physics-Informed Contrastive Self-Attention}
 \author{Ignacio~Martin-Salinas$^*$, Jose~A.~Belloch, Adri\'an~Amor-Mart\'in, Pablo~Zumel, and~Cristina~Fernandez\thanks{All authors are with the Department of Electronic Technology, Universidad Carlos III de Madrid, Av. de la Universidad 30, 28911 Legan\'es, Madrid, Spain.}\thanks{$^*$Corresponding author.}}
@@ -59,7 +60,7 @@ The remainder of this article is organized as follows. Section~\ref{sec:2} revie
 \begin{figure*}[!t]
 \centering
 \includegraphics[width=\textwidth]{fig01_system_and_carla_framework.pdf}
-\caption{End-to-end overview of the proposed sensorless physics-informed \texttt{CARLA-Transformer} diagnostic framework across three stages: (Stage I) online digital PRBS / AC-sweep FRA acquisition on a variable-load synchronous Buck converter ($R_{\mathrm{out}} \in [2, 8]\,\Omega$) without load-current sensors; (Stage II, training only) anchor-preserving counterfactual negative synthesis via exact parasitic-drop SSA complex transfer-function ratios $\Gamma_{\boldsymbol{\alpha}}(j\omega)$ evaluated at nominal load $R_{\mathrm{out}}^{(0)} = 4\,\Omega$, followed by smooth Cartesian $(\operatorname{Re}, \operatorname{Im})$ projection and healthy-only standardization; and (Stage III) 2-block Multi-Head Self-Attention encoding onto $\mathbb{S}^{127}$ with strict zero-anomaly-label \texttt{p97.5} $k$-NN inference.}
+\caption{End-to-end overview of the proposed sensorless physics-informed \texttt{CARLA-Transformer} diagnostic framework: (a) switched synchronous Buck topology ($R_{\mathrm{out}} \in [2, 8]\,\Omega$ unmeasured) with online DPWM PRBS perturbation and empirical variable-load Bode corridor ($\sim 8.9\,\text{dB}$); (b) nominal-load parasitic-drop SSA complex transfer ratios $\Gamma_{\boldsymbol{\alpha}}(j\omega)$ synthesizing counterfactual fault views before Cartesian projection and healthy standardization; and (c) load-invariant embedding geometry on $\mathbb{S}^{127}$ with strict zero-anomaly-label \texttt{p97.5} $k$-NN inference.}
 \label{fig:fig01}
 \end{figure*}
 
@@ -103,7 +104,7 @@ Across the $N_f = 101$ log-spaced frequency grid spanning $f \in [100\,\text{Hz}
 
 \subsection{Exact Parasitic-Drop State-Space Averaged Transfer Function and PSIM Audit}\label{sec:3_2}
 
-Standard textbook small-signal Buck models \cite{middlebrook1976general,erickson2001fundamentals} approximate the control-to-output DC gain as $G_{d0} \approx V_{\mathrm{in}}$ and neglect MOSFET channel drops relative to inductor and load resistances. When $R_{\mathrm{out}}$ varies down to $2.0\,\Omega$, however, series ohmic division and steady-state inductor-current modulation of the switch-node voltage become non-negligible. Averaging the inductor flux-linkage and capacitor charge-balance equations over one switching period $T_s = 1/f_s$ with series conduction resistance $R_s = \mathrm{ESR}_L + D R_{\mathrm{ds},1} + (1 - D) R_{\mathrm{ds},2}$ and steady-state inductor current $I_L = D V_{\mathrm{in}} / (R_{\mathrm{out}} + R_s)$ yields the exact parasitic-drop SSA control-to-output transfer function (\texttt{BuckConverter.transfer\_function} in our open-source library):
+Standard textbook small-signal Buck models \cite{middlebrook1976general,erickson2001fundamentals} approximate the control-to-output DC gain as $G_{d0} \approx V_{\mathrm{in}}$ and neglect MOSFET channel drops relative to inductor and load resistances. When $R_{\mathrm{out}}$ varies down to $2.0\,\Omega$, however, series ohmic division and steady-state inductor-current modulation of the switch-node voltage become non-negligible. Averaging the inductor flux-linkage and capacitor charge-balance equations over one switching period $T_s = 1/f_s$ with series conduction resistance $R_s = \mathrm{ESR}_L + D R_{\mathrm{ds},1} + (1 - D) R_{\mathrm{ds},2}$ and steady-state inductor current $I_L = D V_{\mathrm{in}} / (R_{\mathrm{out}} + R_s)$ yields the exact parasitic-drop SSA control-to-output transfer function (\texttt{Buck\allowbreak{}Converter.\allowbreak{}transfer\_\allowbreak{}function} in our open-source library):
 
 \begin{equation}
 \label{eq:gvd_exact}
@@ -150,8 +151,8 @@ Measured FRA sweeps are natively acquired in polar coordinates $(|H(j\omega_k)|_
 \begin{equation}
 \label{eq:cartesian}
 \begin{split}
-\tilde{\mathbf{X}}_i &= \left[ \operatorname{Re}\!\big(H_i(j\omega_k)\big), \; \operatorname{Im}\!\big(H_i(j\omega_k)\big) \right]_{k=1}^{N_f} \in \mathbb{R}^{N_f \times 2}, \\
-H_i(j\omega_k) &= 10^{|H_i(j\omega_k)|_{\mathrm{dB}}/20} e^{j \angle H_i(j\omega_k)}.
+\tilde{\mathbf{X}}_i &= \big[ \operatorname{Re} H_i(j\omega_k),\; \operatorname{Im} H_i(j\omega_k) \big]_{k=1}^{N_f} \\
+&\quad \in \mathbb{R}^{N_f \times 2}, \quad H_i(j\omega_k) = 10^{|H_i(j\omega_k)|_{\mathrm{dB}}/20} e^{j \angle H_i(j\omega_k)}.
 \end{split}
 \end{equation}
 
@@ -161,12 +162,12 @@ Each frequency-channel bin $(k, c) \in \{1,\dots,N_f\} \times \{1, 2\}$ is stand
 
 During training, only healthy variable-load spectra $\{H_i(j\omega)\}_{i=1}^{N_{\mathrm{train}}}$ are available, and the instantaneous load resistance $R_{\mathrm{out},i}$ of each sweep is treated as \textbf{unmeasured}. To teach the encoder which directions in $\mathbb{R}^{N_f \times 2}$ correspond to genuine component degradation rather than load-damping variations, we synthesize counterfactual hard negatives in the complex plane before standardization.
 
-Given a healthy anchor spectrum $H_i(j\omega)$, we first generate a structurally consistent positive view $H_i^{+}(j\omega)$ by applying mild complex-plane Gaussian jitter ($\sigma_{\mathrm{pos}} = 0.01$ relative to channel dispersion), emulating benign acquisition repeatability. Next, to synthesize a counterfactual fault negative $H_i^{-}(j\omega)$, we sample $m \in \{1, 2\}$ active degradation modes from the five physical fault mechanisms $\mathcal{M} = \{\text{cap. } \mathrm{ESR}_C,\; C_{\mathrm{out}} \text{ drop},\; L_{\mathrm{out}} \text{ drift},\; \text{ind. } \mathrm{ESR}_L,\; \text{switch } R_{\mathrm{ds},1}\}$ (\texttt{PhysicsAnomalyInjector}, single-mode probability $0.70$, dual-mode compound probability $0.30$), draw fault severity multipliers $\boldsymbol{\alpha}$ within the degraded intervals of Table~\ref{tab:converter_parameters}, and evaluate the analytical SSA transfer-function ratio at the \textbf{fixed nominal design load} $R_{\mathrm{out}}^{(0)} = 4.0\,\Omega$:
+Given a healthy anchor spectrum $H_i(j\omega)$, we first generate a structurally consistent positive view $H_i^{+}(j\omega)$ by applying mild complex-plane Gaussian jitter ($\sigma_{\mathrm{pos}} = 0.01$ relative to channel dispersion), emulating benign acquisition repeatability. Next, to synthesize a counterfactual fault negative $H_i^{-}(j\omega)$, we sample $m \in \{1, 2\}$ active degradation modes from the five physical fault mechanisms $\mathcal{M} = \{\mathrm{ESR}_C,\; C_{\mathrm{out}},\; L_{\mathrm{out}},\; \mathrm{ESR}_L,\; R_{\mathrm{ds},1}\}$ (\texttt{Physics\allowbreak{}Anomaly\allowbreak{}Injector}, single-mode probability $0.70$, dual-mode compound probability $0.30$), draw fault severity multipliers $\boldsymbol{\alpha}$ within the degraded intervals of Table~\ref{tab:converter_parameters}, and evaluate the analytical SSA transfer-function ratio at the \textbf{fixed nominal design load} $R_{\mathrm{out}}^{(0)} = 4.0\,\Omega$:
 
 \begin{equation}
 \label{eq:gamma_ratio}
 \begin{split}
-\Gamma_{\boldsymbol{\alpha}}(j\omega_k) &= \frac{G_{vd}\!\left(j\omega_k;\; \boldsymbol{\alpha} \odot \boldsymbol{\theta}^{(0)},\; R_{\mathrm{out}}^{(0)}\right)}{G_{vd}\!\left(j\omega_k;\; \boldsymbol{\theta}^{(0)},\; R_{\mathrm{out}}^{(0)}\right)}, \\
+\Gamma_{\boldsymbol{\alpha}}(j\omega_k) &= \frac{G_{vd}\!\left(j\omega_k,\, \boldsymbol{\alpha} \odot \boldsymbol{\theta}^{(0)},\, R_{\mathrm{out}}^{(0)}\right)}{G_{vd}\!\left(j\omega_k,\, \boldsymbol{\theta}^{(0)},\, R_{\mathrm{out}}^{(0)}\right)}, \\
 H_i^{-}(j\omega_k) &= H_i(j\omega_k) \cdot \Gamma_{\boldsymbol{\alpha}}(j\omega_k).
 \end{split}
 \end{equation}
@@ -185,13 +186,20 @@ Both $H_i^{+}(j\omega)$ and $H_i^{-}(j\omega)$ are projected through the frozen 
 
 Disentangling resistive faults from variable load is inherently a \textbf{non-local cross-frequency comparison problem}: determining whether a depressed resonant peak stems from heavy load ($R_{\mathrm{out}} \approx 2\,\Omega$) or elevated series resistance ($\mathrm{ESR}_L$) requires jointly inspecting the DC gain plateau ($100\text{--}300\,\text{Hz}$), the resonant phase slope ($1.1\,\text{kHz}$), and the high-frequency inductive roll-off ($3\text{--}15\,\text{kHz}$). Local strided \texttt{Conv1D} kernels have limited receptive fields per layer, recurrent \texttt{LSTM}/\texttt{GRU} chains suffer path-length attenuation over $101$ frequency steps, and flattened \texttt{MLP} layers discard spectral token structure and overfit minor bin correlations.
 
-We therefore instantiate \texttt{ContrastiveAutoencoder} with a 2-block \textbf{Multi-Head Self-Attention (\texttt{Transformer})} backbone:
+We therefore instantiate \texttt{ContrastiveAutoencoder} with a 2-block \textbf{Multi-Head Self-Attention (\texttt{Transformer})} backbone (Figure~\ref{fig:fig03}):
 
 \begin{enumerate}
 \item \textbf{Spectral Token Embedding:} Input tokens $\mathbf{X} \in \mathbb{R}^{101 \times 2}$ are linearly projected to $d_1 = 64$ channels and summed with deterministic sinusoidal positional encodings $\mathbf{P} \in \mathbb{R}^{101 \times 64}$ \cite{vaswani2017attention}, anchoring each token to its exact logarithmic frequency index $\omega_k$.
 \item \textbf{Global Self-Attention Encoder ($f_{\theta}$):} Two sequential Transformer blocks of widths $[d_1, d_2] = [64, 128]$ apply $H = 4$ parallel self-attention heads ($d_{\mathrm{key}} = d_\ell / H \in \{16, 32\}$) with residual \texttt{LayerNormalization} and two-layer ReLU feed-forward sublayers ($4 d_\ell \to d_\ell$, widths $256$ and $512$, dropout $0.0$ to preserve exact amplitude precision). Global average pooling across the $101$ frequency tokens followed by a linear projection produces the latent representation $\mathbf{h} = f_{\theta}(\mathbf{X}) \in \mathbb{R}^{128}$.
 \item \textbf{Symmetric Transformer Decoder ($g_{\psi}$) and Projection Head ($\pi_{\omega}$):} A mirrored 2-block self-attention decoder ($[128, 64]$) reconstructs $\hat{\mathbf{X}} = g_{\psi}(\mathbf{h}) \in \mathbb{R}^{101 \times 2}$ exclusively on healthy inputs to prevent dimensional collapse of the healthy load manifold. Simultaneously, a 2-layer MLP projection head (\texttt{Dense(128) -> BatchNorm -> ReLU -> Dense(128)}) with $\ell_2$ normalization maps $\mathbf{h}$ onto the unit hypersphere $\mathbf{z} = \pi_{\omega}(\mathbf{h}) \in \mathbb{S}^{127}$ \cite{chen2020simclr}.
 \end{enumerate}
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{fig03_carla_transformer_architecture.pdf}
+\caption{Dual-branch architecture and exact tensor dimensions of \texttt{CARLA-Transformer}: standardized complex spectral tokens $\mathbf{X} \in \mathbb{R}^{101 \times 2}$ pass through sinusoidal positional encoding and two Multi-Head Self-Attention blocks ($[64, 128]$, $H = 4$, all-to-all $O(1)$ cross-decade routing) into latent bottleneck $\mathbf{h} \in \mathbb{R}^{128}$. During training only, mirrored decoder $g_{\psi}$ minimizes healthy MSE ($w_{\mathrm{rec}} = 5.0$), while projection head $\pi_{\omega}$ maps onto $\mathbb{S}^{127}$ for InfoNCE contrastive learning ($w_c = 0.5$) and zero-label $k$-NN inference.}
+\label{fig:fig03}
+\end{figure*}
 
 \subsection{Composite Self-Supervised Objective and Zero-Label Inference Protocol}\label{sec:4_4}
 
@@ -201,7 +209,8 @@ Given a mini-batch of $B$ healthy variable-load sweeps $\{\mathbf{X}_i\}_{i=1}^B
 \label{eq:carla_loss}
 \begin{split}
 &\mathcal{L}(\theta, \psi, \omega) = \frac{w_{\mathrm{rec}}}{B} \sum_{i=1}^{B} \left\| \mathbf{X}_i - g_{\psi}(f_{\theta}(\mathbf{X}_i)) \right\|_F^2 \\
-&\;- \frac{w_c}{B} \sum_{i=1}^{B} \log \frac{\exp\!\big(s(\mathbf{z}_i, \mathbf{z}_i^{+})\big)}{\splitfrac{\exp\!\big(s(\mathbf{z}_i, \mathbf{z}_i^{+})\big) + \sum_{k \neq i} \exp\!\big(s(\mathbf{z}_i, \mathbf{z}_k)\big)}{+ \sum_{j=1}^{B} \exp\!\big(s(\mathbf{z}_i, \mathbf{z}_j^{-})\big)}},
+&\quad - \frac{w_c}{B} \sum_{i=1}^{B} \Big[ s(\mathbf{z}_i, \mathbf{z}_i^{+}) - \log \Big( \exp\!\big(s(\mathbf{z}_i, \mathbf{z}_i^{+})\big) \\
+&\qquad + \sum_{k \neq i} \exp\!\big(s(\mathbf{z}_i, \mathbf{z}_k)\big) + \sum_{j=1}^{B} \exp\!\big(s(\mathbf{z}_i, \mathbf{z}_j^{-})\big) \Big) \Big],
 \end{split}
 \end{equation}
 
@@ -211,7 +220,10 @@ with $w_{\mathrm{rec}} = 5.0$, $w_c = 0.5$, batch size $B = 32$, and Adam optimi
 
 \begin{equation}
 \label{eq:knn_score}
-a(\mathbf{X}) = \frac{1}{k} \sum_{\mathbf{z}_{(r)} \in \mathcal{N}_k(\pi_{\omega}(f_{\theta}(\mathbf{X}));\, \mathcal{Z}_{\mathrm{train}})} \big\| \pi_{\omega}(f_{\theta}(\mathbf{X})) - \mathbf{z}_{(r)} \big\|_2.
+\begin{split}
+a(\mathbf{X}) &= \frac{1}{k} \sum_{\mathbf{z}_{(r)} \in \mathcal{N}_k(\pi_{\omega}(f_{\theta}(\mathbf{X}));\, \mathcal{Z}_{\mathrm{train}})} \\
+&\qquad \big\| \pi_{\omega}(f_{\theta}(\mathbf{X})) - \mathbf{z}_{(r)} \big\|_2.
+\end{split}
 \end{equation}
 
 To guarantee zero leakage from anomalous test or validation data \cite{kim2021towards}, the binary decision threshold $\tau_{0.975}$ is fixed strictly as the $97.5\text{th}$ empirical percentile (\texttt{p97.5}, corresponding to a nominal $2.5\%$ false-alarm budget) of $a(\mathbf{X})$ over the \textbf{healthy-only} validation split $\mathcal{D}_{\mathrm{val,norm}}$ ($n = 100$), flagging an anomaly iff $a(\mathbf{X}) > \tau_{0.975}$. We also report sensitivity at \texttt{p95} ($5\%$ nominal false-alarm rate) to verify threshold stability.
@@ -258,13 +270,13 @@ To evaluate robustness against physical vector-network-analyzer / online PRBS ac
 
 \subsection{Fixed-Load Simplicity vs. Variable-Load Breakdown}\label{sec:6_1}
 
-As established physically in Figure~\ref{fig:fig02}(a), legitimate operating-load variations $R_{\mathrm{out}} \in [2.0, 8.0]\,\Omega$ on \texttt{dataset\_02} sweep the healthy $LC$ resonance peak across an $8.9\,\text{dB}$ vertical corridor around $1.13\,\text{kHz}$, completely enveloping the subtle low-frequency gain depression of $\mathrm{ESR}_L$ degradation and the high-frequency phase/gain lift of $\mathrm{ESR}_C$ degradation. Under the fixed $4.0\,\Omega$ load of \texttt{dataset\_01}, this resonant corridor vanishes: zero-label \texttt{Raw k-NN (k=1)} already attains $\mathrm{F1}_{\mathrm{p97.5}} = 0.9244$ ($\text{PR-AUC}_{\pi=0.05} = 0.8031$, $99.6\%$ passive single-fault recall, $43.4\%$ $R_{\mathrm{ds},1}$ recall), approaching \texttt{CARLA-Conv1D (SSA)} ($\mathrm{F1}_{\mathrm{p97.5}} = 0.9399 \pm 0.0033$, $\text{PR-AUC}_{\pi=0.05} = 0.8332 \pm 0.0058$). Figure~\ref{fig:fig03} and Table~\ref{tab:variable_load_benchmark} show how severely this picture reverses under the $4\times$ variable load of \texttt{dataset\_02}.
+As established physically in Figure~\ref{fig:fig02}(a), legitimate operating-load variations $R_{\mathrm{out}} \in [2.0, 8.0]\,\Omega$ on \texttt{dataset\_02} sweep the healthy $LC$ resonance peak across an $8.9\,\text{dB}$ vertical corridor around $1.13\,\text{kHz}$, completely enveloping the subtle low-frequency gain depression of $\mathrm{ESR}_L$ degradation and the high-frequency phase/gain lift of $\mathrm{ESR}_C$ degradation. Under the fixed $4.0\,\Omega$ load of \texttt{dataset\_01}, this resonant corridor vanishes: zero-label \texttt{Raw k-NN (k=1)} already attains $\mathrm{F1}_{\mathrm{p97.5}} = 0.9244$ ($\text{PR-AUC}_{\pi=0.05} = 0.8031$, $99.6\%$ passive single-fault recall, $43.4\%$ $R_{\mathrm{ds},1}$ recall), approaching \texttt{CARLA-Conv1D (SSA)} ($\mathrm{F1}_{\mathrm{p97.5}} = 0.9399 \pm 0.0033$, $\text{PR-AUC}_{\pi=0.05} = 0.8332 \pm 0.0058$). Figure~\ref{fig:fig04} and Table~\ref{tab:variable_load_benchmark} show how severely this picture reverses under the $4\times$ variable load of \texttt{dataset\_02}.
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=\textwidth]{fig03_ds01_vs_ds02_and_fault_recall.pdf}
+\includegraphics[width=\textwidth]{fig04_ds01_vs_ds02_and_fault_recall.pdf}
 \caption{(a) Zero-label (\texttt{p97.5}) $\mathrm{F1}$ comparison between fixed operating load (\texttt{dataset\_01}, $R_{\mathrm{out}} = 4\,\Omega$) and $4\times$ variable operating load (\texttt{dataset\_02}, $R_{\mathrm{out}} \in [2, 8]\,\Omega$), quantifying the $-21.3$ F1-point collapse of \texttt{Raw k-NN} and $-9.7$ F1-point degradation of local \texttt{CARLA-Conv1D (SSA)} versus the load invariance of \texttt{CARLA-Transformer (SSA)}. (b) Stratified zero-label (\texttt{p97.5}) recall across all six fault strata on \texttt{dataset\_02}, contrasting the collapse of \texttt{Raw k-NN}, \texttt{AE-Transformer (MSE)}, and \texttt{CARLA-Transformer (Heuristic)} on resistive modes against \texttt{CARLA-Transformer (SSA)}.}
-\label{fig:fig03}
+\label{fig:fig04}
 \end{figure*}
 
 \input{tables/table02_variable_load_benchmark.tex}
@@ -273,7 +285,7 @@ On \texttt{dataset\_02}, \texttt{Raw k-NN (k=5)} drops by more than $21$ F1 poin
 
 \subsection{10-Seed Paired Contrastive Ablation: Physics Ratios vs. Heuristics}\label{sec:6_2}
 
-Table~\ref{tab:10seed_ablation} and Figure~\ref{fig:fig04} isolate the causal contribution of each component in \texttt{CARLA-Transformer (SSA)} across $n = 10$ paired random seeds (\texttt{200042..200051}).
+Table~\ref{tab:10seed_ablation} and Figure~\ref{fig:fig05} isolate the causal contribution of each component in \texttt{CARLA-Transformer (SSA)} across $n = 10$ paired random seeds (\texttt{200042..200051}).
 
 \input{tables/table03_10seed_contrastive_ablation.tex}
 
@@ -282,19 +294,19 @@ Three critical findings emerge from Table~\ref{tab:10seed_ablation}:
 \begin{enumerate}
 \item \textbf{Standard reconstruction autoencoders fail on resistive aging:} \texttt{AE-Transformer (MSE)} reaches only $\mathrm{F1}_{\mathrm{p97.5}} = 0.7540 \pm 0.0111$ ($\mathrm{ESR}_C = 13.2\%$, $\mathrm{ESR}_L = 9.5\%$, $R_{\mathrm{ds},1} = 3.2\%$), and $k$-NN scoring on its unregularized bottleneck (\texttt{AE-Transformer Latent kNN5}, $\mathrm{F1}_{\mathrm{p97.5}} = 0.7090$) mirrors raw input $k$-NN because the encoder devotes its coordinates to reconstructing the dominant $R_{\mathrm{out}}$ resonance swing.
 \item \textbf{Domain-agnostic contrastive heuristics are actively harmful:} Replacing reconstruction-only training with generic time-series CARLA corruptions (\texttt{CARLA-Transformer Heuristic}) \cite{darban2025carla} \textit{lowers} $\mathrm{F1}_{\mathrm{p97.5}}$ to $0.6868 \pm 0.0281$ and $\text{PR-AUC}_{\pi=0.05}$ to $0.5272 \pm 0.0529$. Because random frequency spikes and warps lie orthogonal to smooth rational transfer functions, the projection head learns a trivial smoothness detector that compresses all smooth curves---both healthy variable-load sweeps and genuine ESR/MOSFET faults---into the same tight cluster.
-\item \textbf{Nominal-load SSA transfer ratios unlock $+18.8$ to $+25.5$ F1 points:} Introducing $\Gamma_{\boldsymbol{\alpha}}(j\omega)$ (Eq.~\eqref{eq:gamma_ratio}) improves $\mathrm{F1}_{\mathrm{p97.5}}$ on $10/10$ seeds over every ablation ($p = 0.001953$), surging $\mathrm{ESR}_C$ single-fault recall from $13.2\%$ to \textbf{$89.6\%$}, $\mathrm{ESR}_L$ from $9.5\%$ to \textbf{$92.4\%$}, and $R_{\mathrm{ds},1}$ from $3.2\%$ to \textbf{$36.3\%$} (Figure~\ref{fig:fig04}).
+\item \textbf{Nominal-load SSA transfer ratios unlock $+18.8$ to $+25.5$ F1 points:} Introducing $\Gamma_{\boldsymbol{\alpha}}(j\omega)$ (Eq.~\eqref{eq:gamma_ratio}) improves $\mathrm{F1}_{\mathrm{p97.5}}$ on $10/10$ seeds over every ablation ($p = 0.001953$), surging $\mathrm{ESR}_C$ single-fault recall from $13.2\%$ to \textbf{$89.6\%$}, $\mathrm{ESR}_L$ from $9.5\%$ to \textbf{$92.4\%$}, and $R_{\mathrm{ds},1}$ from $3.2\%$ to \textbf{$36.3\%$} (Figure~\ref{fig:fig05}).
 \end{enumerate}
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=\textwidth]{fig04_pr_curves_and_10seed_ablation.pdf}
+\includegraphics[width=\textwidth]{fig05_pr_curves_and_10seed_ablation.pdf}
 \caption{(a) Prevalence-adjusted Precision-Recall curves at realistic field anomaly prevalence ($\pi = 5\%$) on \texttt{dataset\_02}, demonstrating the wide precision margin of \texttt{CARLA-Transformer (SSA)} ($\text{PR-AUC}_{\pi=0.05} = 0.9126$) over classical detectors and MSE/heuristic ablations at high recall. (b) 10-seed paired zero-label $\mathrm{F1}_{\mathrm{p97.5}}$ and $\text{PR-AUC}_{\pi=0.05}$ distributions (\texttt{mean \ensuremath{\pm} SD} with individual seed markers; $p = 0.00195$ across all non-physics pairs).}
-\label{fig:fig04}
+\label{fig:fig05}
 \end{figure*}
 
 \subsection{Architectural Inductive Bias Across Five Neural Backbones}\label{sec:6_3}
 
-To test whether physics-informed contrastive learning alone suffices regardless of sequence architecture, Table~\ref{tab:encoder_backbones} and Figure~\ref{fig:fig05}(a) benchmark five distinct neural backbones trained under the exact same \texttt{CARLA (SSA)} objective across $5$ paired seeds (\texttt{200042..200046}).
+To test whether physics-informed contrastive learning alone suffices regardless of sequence architecture, Table~\ref{tab:encoder_backbones} and Figure~\ref{fig:fig06}(a) benchmark five distinct neural backbones trained under the exact same \texttt{CARLA (SSA)} objective across $5$ paired seeds (\texttt{200042..200046}).
 
 \input{tables/table04_encoder_backbone_comparison.tex}
 
@@ -302,51 +314,51 @@ To test whether physics-informed contrastive learning alone suffices regardless 
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=\textwidth]{fig05_encoder_backbones_and_scorer_matrix.pdf}
+\includegraphics[width=\textwidth]{fig06_encoder_backbones_and_scorer_matrix.pdf}
 \caption{(a) Five neural encoder backbones trained under identical nominal-load \texttt{CARLA (SSA)} physics ratios (\texttt{5 seeds}, $\text{mean} \pm \text{SD}$) across clean $\mathrm{F1}_{\mathrm{p97.5}}$, $\text{PR-AUC}_{\pi=0.05}$, and $0.15\,\text{dB}$ noisy FRA $\mathrm{F1}_{\mathrm{p97.5}}$. (b) $4 \times 4$ representation-versus-scorer zero-label $\mathrm{F1}_{\mathrm{p97.5}}$ matrix (\texttt{10 seeds}), demonstrating that physics-informed representation geometry---not post-hoc scorer tuning---drives anomaly separability across both $\mathbf{h} \in \mathbb{R}^{128}$ and $\mathbf{z} \in \mathbb{S}^{127}$.}
-\label{fig:fig05}
+\label{fig:fig06}
 \end{figure*}
 
 \subsection{Representation vs. Scorer Disentanglement and the PCA Subspace Cliff under FRA Noise}\label{sec:6_4}
 
 A natural question is whether \texttt{CARLA-Transformer (SSA)} succeeds because of its $k$-NN scorer or because contrastive physics training fundamentally reshapes the representation, and why one could not simply apply linear PCA or Ledoit-Wolf Mahalanobis directly to raw spectra. We answer both questions through two controlled experiments.
 
-First, Table~\ref{tab:representation_vs_scorer} and Figure~\ref{fig:fig05}(b) evaluate four post-hoc zero-label scorers---\texttt{k-NN (k=5)}, \texttt{Ledoit-Wolf Mahalanobis}, \texttt{PCA Residual (d=5)}, and \texttt{PCA Residual (d=10)}---across both the encoder latent space $\mathbf{h} \in \mathbb{R}^{128}$ and normalized projection space $\mathbf{z} \in \mathbb{S}^{127}$ across all $10$ seeds.
+First, Table~\ref{tab:representation_vs_scorer} and Figure~\ref{fig:fig06}(b) evaluate four post-hoc zero-label scorers---\texttt{k-NN (k=5)}, \texttt{Ledoit-Wolf Mahalanobis}, \texttt{PCA Residual (d=5)}, and \texttt{PCA Residual (d=10)}---across both the encoder latent space $\mathbf{h} \in \mathbb{R}^{128}$ and normalized projection space $\mathbf{z} \in \mathbb{S}^{127}$ across all $10$ seeds.
 
 \input{tables/table05_representation_vs_scorer_matrix.tex}
 
 Table~\ref{tab:representation_vs_scorer} proves that \textbf{the physics-informed representation---not a brittle scorer choice---drives separability}: whereas \texttt{AE-Transformer} fails under \texttt{k-NN} and \texttt{Ledoit-Wolf} ($\mathrm{F1} \in [0.7090, 0.7671]$; \texttt{PCA d=5}: $0.8293$) and \texttt{CARLA (Heuristic)} remains poor across every scorer ($\mathrm{F1} \in [0.6674, 0.8042]$), \textit{every} scorer (\texttt{k-NN}, \texttt{Ledoit-Wolf}, \texttt{PCA d=5}, \texttt{PCA d=10}) achieves $\mathrm{F1}_{\mathrm{p97.5}} \in [0.9204, 0.9504]$ once applied to \texttt{CARLA-Transformer (SSA)} embeddings (note that batch-level XLA evaluation across the full validation matrix yields $0.9415 \pm 0.0125$ on $\mathbf{z}$, identical within $2 \times 10^{-4}$ to standalone healthy-split evaluation $0.9417 \pm 0.0128$). Even pairing \texttt{CARLA (SSA)} projections with Ledoit-Wolf shrinkage reaches $\mathrm{F1}_{\mathrm{p97.5}} = 0.9504 \pm 0.0109$ ($\text{ROC-AUC} = 0.9784$, $\mathrm{ESR}_C = 95.7\%$), while we retain \texttt{k-NN (k=5)} as our canonical scorer for its non-parametric simplicity and zero matrix-inversion cost.
 
-Second, Figure~\ref{fig:fig06} and Table~\ref{tab:fra_noise_sweep} expose why raw-input linear \texttt{PCA Reconstruction} \cite{jackson1979control} is unsafe for practical zero-label FRA deployment despite its strong noiseless oracle score:
+Second, Figure~\ref{fig:fig07} and Table~\ref{tab:fra_noise_sweep} expose why raw-input linear \texttt{PCA Reconstruction} \cite{jackson1979control} is unsafe for practical zero-label FRA deployment despite its strong noiseless oracle score:
 
 \begin{enumerate}
-\item \textbf{Unobservable Zero-Label Subspace Cliff (Figure~\ref{fig:fig06}(a)):} On healthy variable-load spectra, the first $d = 3$, $4$, and $5$ principal components already capture \textbf{$95.0\%$}, \textbf{$99.0\%$}, and \textbf{$99.5\%$} of total variance. Standard zero-label cumulative-variance rules therefore select $d \in \{3, 4, 5\}$, where \texttt{PCA} fails ($\mathrm{F1}_{\mathrm{p97.5}} = 0.7229$, $0.7493$, $0.7347$). High noiseless accuracy exists \textit{only} inside a razor-thin window $d \in \{8, 9, 10\}$ ($99.987\%\text{--}99.995\%$ cumulative variance, peaking at $\mathrm{F1}_{\mathrm{p97.5}} = 0.9584$ for $d = 8$) before collapsing again at $d = 12$ ($0.7710$) and $d = 20$ ($0.6894$). Without anomalous validation labels, an operator cannot identify $d = 8$.
-\item \textbf{Catastrophic Collapse under Realistic FRA Instrument Noise (Figure~\ref{fig:fig06}(b) \& Table~\ref{tab:fra_noise_sweep}):} Because PCA at $d \in \{8, 10\}$ relies on residual projections onto singular vectors carrying less than $0.013\%$ of signal variance, realistic polar FRA measurement jitter ($\sigma_{\mathrm{dB}} \ge 0.10\,\text{dB}$) immediately swamps the residual subspace.
+\item \textbf{Unobservable Zero-Label Subspace Cliff (Figure~\ref{fig:fig07}(a)):} On healthy variable-load spectra, the first $d = 3$, $4$, and $5$ principal components already capture \textbf{$95.0\%$}, \textbf{$99.0\%$}, and \textbf{$99.5\%$} of total variance. Standard zero-label cumulative-variance rules therefore select $d \in \{3, 4, 5\}$, where \texttt{PCA} fails ($\mathrm{F1}_{\mathrm{p97.5}} = 0.7229$, $0.7493$, $0.7347$). High noiseless accuracy exists \textit{only} inside a razor-thin window $d \in \{8, 9, 10\}$ ($99.987\%\text{--}99.995\%$ cumulative variance, peaking at $\mathrm{F1}_{\mathrm{p97.5}} = 0.9584$ for $d = 8$) before collapsing again at $d = 12$ ($0.7710$) and $d = 20$ ($0.6894$). Without anomalous validation labels, an operator cannot identify $d = 8$.
+\item \textbf{Catastrophic Collapse under Realistic FRA Instrument Noise (Figure~\ref{fig:fig07}(b) \& Table~\ref{tab:fra_noise_sweep}):} Because PCA at $d \in \{8, 10\}$ relies on residual projections onto singular vectors carrying less than $0.013\%$ of signal variance, realistic polar FRA measurement jitter ($\sigma_{\mathrm{dB}} \ge 0.10\,\text{dB}$) immediately swamps the residual subspace.
 \end{enumerate}
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=\textwidth]{fig06_pca_cliff_and_7level_fra_noise.pdf}
+\includegraphics[width=\textwidth]{fig07_pca_cliff_and_7level_fra_noise.pdf}
 \caption{(a) Zero-label \texttt{PCA Reconstruction} $\mathrm{F1}_{\mathrm{p97.5}}$ across subspace rank $d \in [2, 20]$: standard cumulative-variance rules ($90\text{--}99.5\%$, $d \le 5$) fail ($\mathrm{F1} \le 0.7493$), while noiseless performance peaks in an unobservable $99.99\%$-variance window ($d=8$) that collapses under $0.15\,\text{dB}$ / $0.75^\circ$ FRA noise, whereas \texttt{CARLA-Transformer (SSA)} retains $\mathrm{F1}_{\mathrm{p97.5}} = 0.9284 \pm 0.0154$. (b) Seven-level parametric FRA polar-jitter sweep ($\sigma_{\mathrm{mag}} \in [0.00, 0.60]\,\text{dB}$, $\sigma_\phi = 5\sigma_{\mathrm{mag}}$).}
-\label{fig:fig06}
+\label{fig:fig07}
 \end{figure*}
 
 \input{tables/table06_fra_noise_robustness_sweep.tex}
 
-Under a standard $0.15\,\text{dB}$ / $0.75^\circ$ online FRA noise floor, clean-trained \texttt{CARLA-Transformer (SSA)} achieves $\mathrm{F1}_{\mathrm{p97.5}} = 0.9284 \pm 0.0154$ on the primary matched calibration realization (Figure~\ref{fig:fig06}(a)) and $0.9160 \pm 0.0138$ across the independent multi-level sweep (Table~\ref{tab:fra_noise_sweep}), whereas clean-fitted \texttt{PCA (d=8)} plunges from $0.9584$ to $0.7746\text{--}0.7967$, \texttt{PCA (d=10)} collapses to $0.6478$, and \texttt{Mahalanobis (Ledoit-Wolf)} drops from $0.8992$ to $0.7240$. Even re-fitting PCA directly on noisy training spectra (\texttt{PCA d=8 Noisy-Refit}) drops to $0.8177$ at $0.15\,\text{dB}$ and $0.7337$ at $0.25\,\text{dB}$, whereas \texttt{CARLA-Transformer (SSA)}---without any noisy retraining---maintains $\mathrm{F1}_{\mathrm{p97.5}} = 0.9025 \pm 0.0199$ at $0.25\,\text{dB}$ / $1.25^\circ$ ($+16.9$ to $+35.3$ F1 points over PCA) because global self-attention integrates coherent pole-zero shifts across all $101$ frequency tokens, averaging out uncorrelated bin-wise jitter.
+Under a standard $0.15\,\text{dB}$ / $0.75^\circ$ online FRA noise floor, clean-trained \texttt{CARLA-Transformer (SSA)} achieves $\mathrm{F1}_{\mathrm{p97.5}} = 0.9284 \pm 0.0154$ on the primary matched calibration realization (Figure~\ref{fig:fig07}(a)) and $0.9160 \pm 0.0138$ across the independent multi-level sweep (Table~\ref{tab:fra_noise_sweep}), whereas clean-fitted \texttt{PCA (d=8)} plunges from $0.9584$ to $0.7746\text{--}0.7967$, \texttt{PCA (d=10)} collapses to $0.6478$, and \texttt{Mahalanobis (Ledoit-Wolf)} drops from $0.8992$ to $0.7240$. Even re-fitting PCA directly on noisy training spectra (\texttt{PCA d=8 Noisy-Refit}) drops to $0.8177$ at $0.15\,\text{dB}$ and $0.7337$ at $0.25\,\text{dB}$, whereas \texttt{CARLA-Transformer (SSA)}---without any noisy retraining---maintains $\mathrm{F1}_{\mathrm{p97.5}} = 0.9025 \pm 0.0199$ at $0.25\,\text{dB}$ / $1.25^\circ$ ($+16.9$ to $+35.3$ F1 points over PCA) because global self-attention integrates coherent pole-zero shifts across all $101$ frequency tokens, averaging out uncorrelated bin-wise jitter.
 
 \subsection{Sample-Complexity Learning Curves and Strict Leave-One-Fault-Out Generalization}\label{sec:6_5}
 
-To assess commissioning practicality when collecting healthy variable-load sweeps on a new converter design, Figure~\ref{fig:fig07}(a) evaluates zero-label performance as healthy training set size scales from $N_{\mathrm{train}} = 50$ to $300$ ($5$ subsampling seeds per point). Even with only $N_{\mathrm{train}} = 100$ healthy variable-load sweeps, \texttt{CARLA-Transformer (SSA)} reaches $\mathrm{F1}_{\mathrm{p97.5}} = 0.9006 \pm 0.0481$ (median $0.9231$, $\text{PR-AUC}_{\pi=0.05} = 0.8440 \pm 0.0459$), and by $N_{\mathrm{train}} = 200$ it converges tightly to $\mathrm{F1}_{\mathrm{p97.5}} = 0.9358 \pm 0.0074$ and $\text{PR-AUC}_{\pi=0.05} = 0.9073 \pm 0.0135$---already surpassing full-dataset \texttt{PCA (d=10)} ($\text{PR-AUC}_{\pi=0.05} = 0.8538$ at $N_{\mathrm{train}} = 300$) and \texttt{Ledoit-Wolf Mahalanobis} ($0.7874$).
+To assess commissioning practicality when collecting healthy variable-load sweeps on a new converter design, Figure~\ref{fig:fig08}(a) evaluates zero-label performance as healthy training set size scales from $N_{\mathrm{train}} = 50$ to $300$ ($5$ subsampling seeds per point). Even with only $N_{\mathrm{train}} = 100$ healthy variable-load sweeps, \texttt{CARLA-Transformer (SSA)} reaches $\mathrm{F1}_{\mathrm{p97.5}} = 0.9006 \pm 0.0481$ (median $0.9231$, $\text{PR-AUC}_{\pi=0.05} = 0.8440 \pm 0.0459$), and by $N_{\mathrm{train}} = 200$ it converges tightly to $\mathrm{F1}_{\mathrm{p97.5}} = 0.9358 \pm 0.0074$ and $\text{PR-AUC}_{\pi=0.05} = 0.9073 \pm 0.0135$---already surpassing full-dataset \texttt{PCA (d=10)} ($\text{PR-AUC}_{\pi=0.05} = 0.8538$ at $N_{\mathrm{train}} = 300$) and \texttt{Ledoit-Wolf Mahalanobis} ($0.7874$).
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=\textwidth]{fig07_learning_curves_and_lofo_generalization.pdf}
+\includegraphics[width=\textwidth]{fig08_learning_curves_and_lofo_generalization.pdf}
 \caption{(a) Commissioning sample efficiency across healthy training set size $N_{\mathrm{train}} \in \{50, 100, 150, 200, 250, 300\}$ (\texttt{5 seeds}, $\text{mean} \pm \text{SD}$ of field-prevalence $\text{PR-AUC}_{\pi=0.05}$), showing rapid convergence of \texttt{CARLA-Transformer (SSA)} by $N_{\mathrm{train}} = 200$ healthy sweeps. (b) Strict 5-mode Leave-One-Fault-Out (LOFO) zero-shot recall at \texttt{p97.5} (\texttt{median} bars with individual seed scatter and held-out mode $\text{ROC-AUC}$).}
-\label{fig:fig07}
+\label{fig:fig08}
 \end{figure*}
 
-Crucially, critics of physics-informed synthetic negative training must ask whether \texttt{CARLA-Transformer (SSA)} merely memorizes the five analytical fault templates supplied during training or learns a genuinely generalizable boundary around the healthy converter manifold. Table~\ref{tab:lofo_generalization} and Figure~\ref{fig:fig07}(b) report a \textbf{strict 5-mode Leave-One-Fault-Out (LOFO)} experiment across $5$ seeds (\texttt{200042..200046}): in each row, the target physical degradation mechanism is \textbf{completely removed} from \texttt{PhysicsAnomalyInjector} during training (both as a single fault and inside compound pairs), and the resulting model is evaluated zero-shot on held-out switched PSIM sweeps exhibiting that unseen single-component fault.
+Crucially, critics of physics-informed synthetic negative training must ask whether \texttt{CARLA-Transformer (SSA)} merely memorizes the five analytical fault templates supplied during training or learns a genuinely generalizable boundary around the healthy converter manifold. Table~\ref{tab:lofo_generalization} and Figure~\ref{fig:fig08}(b) report a \textbf{strict 5-mode Leave-One-Fault-Out (LOFO)} experiment across $5$ seeds (\texttt{200042..200046}): in each row, the target physical degradation mechanism is \textbf{completely removed} from \texttt{Physics\allowbreak{}Anomaly\allowbreak{}Injector} during training (both as a single fault and inside compound pairs), and the resulting model is evaluated zero-shot on held-out switched PSIM sweeps exhibiting that unseen single-component fault.
 
 \input{tables/table07_lofo_generalization.tex}
 
@@ -360,20 +372,20 @@ Table~\ref{tab:lofo_generalization} demonstrates remarkable physical cross-mode 
 
 \subsection{Mechanistic Attribution: Global Reference Bus vs. the Resonance Load-Invariance Notch}\label{sec:6_6}
 
-Finally, to understand \textit{how} \texttt{CARLA-Transformer (SSA)} achieves load invariance without load sensors, we heed the methodological caution of Jain and Wallace \cite{jain2019attention} that raw self-attention weights do not necessarily equate to feature attribution, and pair attention-entropy inspection with axiomatic input-gradient sensitivity $\|\nabla_{\mathbf{X}_k} a(\mathbf{X})\|_2$ \cite{sundararajan2017axiomatic} across all $10$ trained seeds (\texttt{transformer\_attention\_audit.json}, Figure~\ref{fig:fig08}).
+Finally, to understand \textit{how} \texttt{CARLA-Transformer (SSA)} achieves load invariance without load sensors, we heed the methodological caution of Jain and Wallace \cite{jain2019attention} that raw self-attention weights do not necessarily equate to feature attribution, and pair attention-entropy inspection with axiomatic input-gradient sensitivity $\|\nabla_{\mathbf{X}_k} a(\mathbf{X})\|_2$ \cite{sundararajan2017axiomatic} across all $10$ trained seeds (\texttt{transformer\_\allowbreak{}attention\_\allowbreak{}audit.json}, Figure~\ref{fig:fig09}).
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=\textwidth]{fig08_attention_and_jacobian_saliency.pdf}
+\includegraphics[width=\textwidth]{fig09_attention_and_jacobian_saliency.pdf}
 \caption{Mechanistic attribution across $10$ seeds on \texttt{dataset\_02}: (a) Layer-averaged Multi-Head Self-Attention key routing shows that \texttt{AE-Transformer (MSE)} ($H = 0.8298$) and \texttt{CARLA-Transformer (Heuristic)} ($H = 0.8281$) collapse onto the load-dominated $1.01\,\text{kHz}$ resonance peak ($\sim 6.5\%$ per bin), whereas \texttt{CARLA-Transformer (SSA)} ($H = 0.9996 \pm 0.0002$) establishes a uniform all-to-all spectral reference bus ($0.99\%$ per bin). (b) Input-Jacobian score sensitivity $\|\nabla_{\mathbf{X}_k} a(\mathbf{X})\|_2$ reveals that \texttt{AE-Transformer} ($2.92{\times}$ band average, peaking near $7.9{\times}$) and \texttt{Heuristic} ($2.67{\times}$) amplify benign load resonance swings, whereas \texttt{CARLA-Transformer (SSA)} carves out a learned \textbf{resonance load-invariance notch} ($0.78{\times}\text{--}0.83{\times}$ suppressed sensitivity in $[0.7, 2.0]\,\text{kHz}$) alongside targeted DC and high-frequency diagnostic sensitivity.}
-\label{fig:fig08}
+\label{fig:fig09}
 \end{figure*}
 
-Figure~\ref{fig:fig08} exposes a striking two-level mechanistic divergence between physics-free and physics-informed self-attention:
+Figure~\ref{fig:fig09} exposes a striking two-level mechanistic divergence between physics-free and physics-informed self-attention:
 
 \begin{enumerate}
-\item \textbf{Elimination of Resonance Attention Collapse (Figure~\ref{fig:fig08}(a)):} Both \texttt{AE-Transformer (MSE)} ($H = 0.8298 \pm 0.0421$) and \texttt{CARLA-Transformer (Heuristic)} ($H = 0.8281 \pm 0.0423$) concentrate their self-attention keys sharply around $1.01\,\text{kHz}$ because resonant load swings dominate input variance. By contrast, \texttt{CARLA-Transformer (SSA)} achieves near-maximal normalized Shannon entropy ($H = 0.9996 \pm 0.0002$, band enrichment $0.988{\times}\text{--}1.011{\times}$ across DC, resonance, mid-inductive, and high-frequency ESR bands), turning self-attention into an \textbf{all-to-all spectral reference bus} so subsequent feed-forward layers can compute cross-decade gain/phase ratios.
-\item \textbf{The Resonance Load-Invariance Notch \& Fault-Aligned Routing (Figure~\ref{fig:fig08}(b)):} Whereas \texttt{AE-Transformer} and \texttt{CARLA (Heuristic)} suffer $2.92{\times}$ and $2.67{\times}$ Jacobian sensitivity spikes inside $[0.7, 2.0]\,\text{kHz}$, \texttt{CARLA-Transformer (SSA)} actively \textit{suppresses} resonant gradient sensitivity to $(0.833 \pm 0.086){\times}$ on healthy sweeps ($0.792{\times}$ on $\mathrm{ESR}_L$, $0.781{\times}$ on $R_{\mathrm{ds},1}$)---preventing benign $9\,\text{dB}$ $R_{\mathrm{out}}$ swings at $f_0$ from triggering false alarms. Simultaneously, for series ohmic faults ($\mathrm{ESR}_L$, $R_{\mathrm{ds},1}$), Jacobian enrichment peaks in the DC/low-frequency gain plateau ($100\text{--}400\,\text{Hz}$, enrichment \textbf{$(1.234 \pm 0.086){\times}$} and \textbf{$(1.228 \pm 0.085){\times}$}), while for $\mathrm{ESR}_C$ it routes into the mid-inductive and high-frequency zero transition ($2\text{--}50\,\text{kHz}$, enrichment \textbf{$(1.080 \pm 0.075){\times}$}).
+\item \textbf{Elimination of Resonance Attention Collapse (Figure~\ref{fig:fig09}(a)):} Both \texttt{AE-Transformer (MSE)} ($H = 0.8298 \pm 0.0421$) and \texttt{CARLA-Transformer (Heuristic)} ($H = 0.8281 \pm 0.0423$) concentrate their self-attention keys sharply around $1.01\,\text{kHz}$ because resonant load swings dominate input variance. By contrast, \texttt{CARLA-Transformer (SSA)} achieves near-maximal normalized Shannon entropy ($H = 0.9996 \pm 0.0002$, band enrichment $0.988{\times}\text{--}1.011{\times}$ across DC, resonance, mid-inductive, and high-frequency ESR bands), turning self-attention into an \textbf{all-to-all spectral reference bus} so subsequent feed-forward layers can compute cross-decade gain/phase ratios.
+\item \textbf{The Resonance Load-Invariance Notch \& Fault-Aligned Routing (Figure~\ref{fig:fig09}(b)):} Whereas \texttt{AE-Transformer} and \texttt{CARLA (Heuristic)} suffer $2.92{\times}$ and $2.67{\times}$ Jacobian sensitivity spikes inside $[0.7, 2.0]\,\text{kHz}$, \texttt{CARLA-Transformer (SSA)} actively \textit{suppresses} resonant gradient sensitivity to $(0.833 \pm 0.086){\times}$ on healthy sweeps ($0.792{\times}$ on $\mathrm{ESR}_L$, $0.781{\times}$ on $R_{\mathrm{ds},1}$)---preventing benign $9\,\text{dB}$ $R_{\mathrm{out}}$ swings at $f_0$ from triggering false alarms. Simultaneously, for series ohmic faults ($\mathrm{ESR}_L$, $R_{\mathrm{ds},1}$), Jacobian enrichment peaks in the DC/low-frequency gain plateau ($100\text{--}400\,\text{Hz}$, enrichment \textbf{$(1.234 \pm 0.086){\times}$} and \textbf{$(1.228 \pm 0.085){\times}$}), while for $\mathrm{ESR}_C$ it routes into the mid-inductive and high-frequency zero transition ($2\text{--}50\,\text{kHz}$, enrichment \textbf{$(1.080 \pm 0.075){\times}$}).
 \end{enumerate}
 
 \section{Discussion, Deployment Guidelines, and Limitations}\label{sec:7}
@@ -407,7 +419,7 @@ By deriving an exact parasitic-drop State-Space Averaged Buck model ($0.0952\%$ 
 
 \section*{Data and Code Availability}
 
-The complete object-oriented Python framework (\texttt{src/}), exact parasitic-drop SSA physics injector (\texttt{src/data/physics\_anomaly.py}), switched Altair PSIM benchmark manifests and datasets (\texttt{dataset\_01} and \texttt{dataset\_02}), automated statistical/integrity audits (\texttt{scripts/audit\_publication\_artifacts.py}, \texttt{scripts/audit\_variable\_load\_manuscript.py}), and persisted multi-seed JSON/CSV results (\texttt{papers/results/mlwa\_study\_dataset02/}) are maintained reproducibly via \texttt{uv} and \texttt{pytest} in the project repository.
+The complete object-oriented Python framework (\texttt{src/}), exact parasitic-drop SSA physics injector (\texttt{src/data/physics\_\allowbreak{}anomaly.py}), switched Altair PSIM benchmark manifests and datasets (\texttt{dataset\_01} and \texttt{dataset\_02}), automated statistical/integrity audits (\texttt{scripts/audit\_\allowbreak{}publication\_\allowbreak{}artifacts.py}, \texttt{scripts/audit\_\allowbreak{}variable\_\allowbreak{}load\_\allowbreak{}manuscript.py}), and persisted multi-seed JSON/CSV results (\texttt{papers/results/mlwa\_\allowbreak{}study\_\allowbreak{}dataset02/}) are maintained reproducibly via \texttt{uv} and \texttt{pytest} in the project repository.
 
 \section*{Acknowledgments}
 
