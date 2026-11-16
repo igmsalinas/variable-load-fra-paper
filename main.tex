@@ -2,6 +2,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath,amssymb,amsfonts}
+\usepackage{mathtools}
+\usepackage{microtype}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{multirow}
@@ -49,7 +51,7 @@ The primary contributions of this paper are fivefold:
 \item \textbf{Sensorless Nominal-Load Physics-Ratio Contrastive Synthesis:} We formulate a complex-plane counterfactual negative generator that applies exact SSA transfer-function ratios at nominal load directly to measured variable-load spectra, requiring \textbf{zero online load measurement} and \textbf{zero real fault training samples}.
 \item \textbf{Systematic Inductive-Bias and Zero-Label Benchmark:} Across 10 paired random seeds under strict zero-anomaly-label calibration (\texttt{p97.5} healthy validation quantile) and realistic field-prevalence Precision-Recall metrics ($\pi = 5\%$), we demonstrate that \texttt{CARLA-Transformer} ($\mathrm{F1} = 0.9417 \pm 0.0128$, $\text{PR-AUC}_{\pi=0.05} = 0.9126 \pm 0.0308$) decisively outperforms MSE autoencoders ($\mathrm{F1} = 0.7540$), heuristic CARLA ($\mathrm{F1} = 0.6868$), classical one-class baselines, and alternative sequence/local backbones (\texttt{LSTM}, \texttt{Conv1D}, \texttt{MLP}, \texttt{GRU}).
 \item \textbf{Resolution of the Linear Subspace Cliff under FRA Instrument Noise:} Through controlled representation-versus-scorer experiments and a parametric FRA measurement-noise sweep ($0.00\text{--}0.60\,\text{dB}$ / $0.00^\circ\text{--}3.00^\circ$), we prove why linear PCA residual detectors suffer an unobservable hyperparameter cliff and catastrophic noise degradation, whereas \texttt{CARLA-Transformer} maintains $\mathrm{F1} = 0.9284$ at $0.15\,\text{dB}$ instrument noise (\texttt{0.9160} on independent multi-level sweeps, $+11.9$ to $+26.8$ F1 points over PCA).
-\item \textbf{Leave-One-Fault-Out Generalization and Mechanistic Saliency Attribution:} Using a 5-mode strict Leave-One-Fault-Out (LOFO) protocol and input-Jacobian sensitivity analysis \cite{jain2019attention,sundararajan2017axiomatic}, we verify zero-shot detection of unseen physical fault modes ($\text{ROC-AUC} = 0.9470\text{--}0.9989$ across passive modes) and show that \texttt{CARLA-Transformer} learns a physical \textit{resonance load-invariance notch} ($0.78\times\text{--}0.83\times$ suppressed sensitivity at $0.7\text{--}2\,\text{kHz}$) coupled with targeted DC/high-frequency diagnostic sensitivity.
+\item \textbf{Leave-One-Fault-Out Generalization and Mechanistic Saliency Attribution:} Using a 5-mode strict Leave-One-Fault-Out (LOFO) protocol and input-Jacobian sensitivity analysis \cite{jain2019attention,sundararajan2017axiomatic}, we verify zero-shot detection of unseen physical fault modes ($\text{ROC-AUC} = 0.9470\text{--}0.9989$ across passive modes) and show that \texttt{CARLA-Transformer} learns a physical \textit{resonance load-invariance notch} ($0.78{\times}\text{--}0.83{\times}$ suppressed sensitivity at $0.7\text{--}2\,\text{kHz}$) coupled with targeted DC/high-frequency diagnostic sensitivity.
 \end{enumerate}
 
 The remainder of this article is organized as follows. Section~\ref{sec:2} reviews related work in converter FRA diagnostics and self-supervised anomaly detection. Section~\ref{sec:3} formulates the variable-load physical plant, exact SSA equations, PSIM fidelity audit, and semiconductor observability bounds. Section~\ref{sec:4} details the \texttt{CARLA-Transformer} architecture, physics-ratio negative synthesis, and zero-label inference protocol. Section~\ref{sec:5} specifies the experimental design and statistical metrics. Section~\ref{sec:6} presents the empirical results, ablations, noise-robustness sweeps, LOFO generalization, and mechanistic attributions. Section~\ref{sec:7} discusses practical deployment guidelines and physical limitations, and Section~\ref{sec:8} concludes the study.
@@ -91,7 +93,10 @@ At nominal parameters, the undamped $LC$ resonant frequency and capacitor ESR ze
 
 \begin{equation}
 \label{eq:resonance}
-f_0 = \frac{1}{2\pi\sqrt{L_{\mathrm{out}}^{(0)} C_{\mathrm{out}}^{(0)}}} \approx 1.125\,\text{kHz}, \qquad f_z = \frac{1}{2\pi C_{\mathrm{out}}^{(0)} \mathrm{ESR}_C^{(0)}} \approx 79.58\,\text{kHz}.
+\begin{split}
+f_0 &= \frac{1}{2\pi\sqrt{L_{\mathrm{out}}^{(0)} C_{\mathrm{out}}^{(0)}}} \approx 1.125\,\text{kHz}, \\
+f_z &= \frac{1}{2\pi C_{\mathrm{out}}^{(0)} \mathrm{ESR}_C^{(0)}} \approx 79.58\,\text{kHz}.
+\end{split}
 \end{equation}
 
 Across the $N_f = 101$ log-spaced frequency grid spanning $f \in [100\,\text{Hz}, 50\,\text{kHz}]$ (up to the Nyquist limit $f_s / 2$), healthy manufacturing tolerances follow standard industrial dispersion \cite{iec60384_1}, sampled jointly with operating load $R_{\mathrm{out}} \in [2.0, 8.0]\,\Omega$ via Latin Hypercube Sampling (LHS) \cite{mckay1979comparison} with a strictly disjoint guard band separating healthy tolerance limits from degraded fault intervals (Table~\ref{tab:converter_parameters}). To ensure physical consistency across all operating points, the minimum inductor valley current occurs at the lightest load ($R_{\mathrm{out}} = 8\,\Omega$, $I_{\mathrm{out}} \approx 2.5\,\text{A}$) and minimum degraded inductance ($L_{\mathrm{out}} = 110\,\mu\text{H}$), yielding peak-to-peak ripple $\Delta i_L = V_{\mathrm{out}}(1 - D)/(L_{\mathrm{out}} f_s) \approx 1.09\,\text{A}$ and minimum valley current $I_{L,\min} = I_{\mathrm{out}} - \Delta i_L/2 \approx 1.95\,\text{A} > 0$, strictly guaranteeing CCM operation across 100\% of healthy and faulty states.
@@ -104,7 +109,7 @@ Standard textbook small-signal Buck models \cite{middlebrook1976general,erickson
 \label{eq:gvd_exact}
 \begin{split}
 &G_{vd}(s; \boldsymbol{\theta}, R_{\mathrm{out}}) = V_{\mathrm{eff}} \frac{R_{\mathrm{out}}}{R_{\mathrm{out}} + R_s} \\
-&\quad \times \frac{1 + s C_{\mathrm{out}} \mathrm{ESR}_C}{s^2 L_{\mathrm{out}} C_{\mathrm{out}} \alpha_C + s \left[ C_{\mathrm{out}} \left( R_s \alpha_C + \frac{R_{\mathrm{out}} \mathrm{ESR}_C}{R_{\mathrm{out}} + R_s} \right) + \frac{L_{\mathrm{out}}}{R_{\mathrm{out}} + R_s} \right] + 1},
+&\times \frac{1 + s C_{\mathrm{out}} \mathrm{ESR}_C}{\splitfrac{s^2 L_{\mathrm{out}} C_{\mathrm{out}} \alpha_C + 1}{+ s\!\left[ C_{\mathrm{out}}\!\left( R_s \alpha_C + \frac{R_{\mathrm{out}} \mathrm{ESR}_C}{R_{\mathrm{out}} + R_s} \right) + \frac{L_{\mathrm{out}}}{R_{\mathrm{out}} + R_s} \right]}},
 \end{split}
 \end{equation}
 
@@ -195,8 +200,8 @@ Given a mini-batch of $B$ healthy variable-load sweeps $\{\mathbf{X}_i\}_{i=1}^B
 \begin{equation}
 \label{eq:carla_loss}
 \begin{split}
-\mathcal{L}(\theta, \psi, \omega) = {}& \frac{w_{\mathrm{rec}}}{B} \sum_{i=1}^{B} \left\| \mathbf{X}_i - g_{\psi}(f_{\theta}(\mathbf{X}_i)) \right\|_F^2 \\
-&- \frac{w_c}{B} \sum_{i=1}^{B} \log \frac{\exp\!\big(s(\mathbf{z}_i, \mathbf{z}_i^{+})\big)}{\exp\!\big(s(\mathbf{z}_i, \mathbf{z}_i^{+})\big) + \sum_{k \neq i} \exp\!\big(s(\mathbf{z}_i, \mathbf{z}_k)\big) + \sum_{j=1}^{B} \exp\!\big(s(\mathbf{z}_i, \mathbf{z}_j^{-})\big)},
+&\mathcal{L}(\theta, \psi, \omega) = \frac{w_{\mathrm{rec}}}{B} \sum_{i=1}^{B} \left\| \mathbf{X}_i - g_{\psi}(f_{\theta}(\mathbf{X}_i)) \right\|_F^2 \\
+&\;- \frac{w_c}{B} \sum_{i=1}^{B} \log \frac{\exp\!\big(s(\mathbf{z}_i, \mathbf{z}_i^{+})\big)}{\splitfrac{\exp\!\big(s(\mathbf{z}_i, \mathbf{z}_i^{+})\big) + \sum_{k \neq i} \exp\!\big(s(\mathbf{z}_i, \mathbf{z}_k)\big)}{+ \sum_{j=1}^{B} \exp\!\big(s(\mathbf{z}_i, \mathbf{z}_j^{-})\big)}},
 \end{split}
 \end{equation}
 
@@ -206,7 +211,7 @@ with $w_{\mathrm{rec}} = 5.0$, $w_c = 0.5$, batch size $B = 32$, and Adam optimi
 
 \begin{equation}
 \label{eq:knn_score}
-a(\mathbf{X}) = \frac{1}{k} \sum_{\mathbf{z}_{(r)} \in \mathcal{N}_k(\pi_{\omega}(f_{\theta}(\mathbf{X}));\, \mathcal{Z}_{\mathrm{train}})} \left\| \pi_{\omega}(f_{\theta}(\mathbf{X})) - \mathbf{z}_{(r)} \right\|_2.
+a(\mathbf{X}) = \frac{1}{k} \sum_{\mathbf{z}_{(r)} \in \mathcal{N}_k(\pi_{\omega}(f_{\theta}(\mathbf{X}));\, \mathcal{Z}_{\mathrm{train}})} \big\| \pi_{\omega}(f_{\theta}(\mathbf{X})) - \mathbf{z}_{(r)} \big\|_2.
 \end{equation}
 
 To guarantee zero leakage from anomalous test or validation data \cite{kim2021towards}, the binary decision threshold $\tau_{0.975}$ is fixed strictly as the $97.5\text{th}$ empirical percentile (\texttt{p97.5}, corresponding to a nominal $2.5\%$ false-alarm budget) of $a(\mathbf{X})$ over the \textbf{healthy-only} validation split $\mathcal{D}_{\mathrm{val,norm}}$ ($n = 100$), flagging an anomaly iff $a(\mathbf{X}) > \tau_{0.975}$. We also report sensitivity at \texttt{p95} ($5\%$ nominal false-alarm rate) to verify threshold stability.
@@ -283,7 +288,7 @@ Three critical findings emerge from Table~\ref{tab:10seed_ablation}:
 \begin{figure*}[!t]
 \centering
 \includegraphics[width=\textwidth]{fig04_pr_curves_and_10seed_ablation.pdf}
-\caption{(a) Prevalence-adjusted Precision-Recall curves at realistic field anomaly prevalence ($\pi = 5\%$) on \texttt{dataset\_02}, demonstrating the wide precision margin of \texttt{CARLA-Transformer (SSA)} ($\text{PR-AUC}_{\pi=0.05} = 0.9126$) over classical detectors and MSE/heuristic ablations at high recall. (b) 10-seed paired zero-label $\mathrm{F1}_{\mathrm{p97.5}}$ and $\text{PR-AUC}_{\pi=0.05}$ distributions (\texttt{mean \$\pm\$ SD} with individual seed markers; $p = 0.00195$ across all non-physics pairs).}
+\caption{(a) Prevalence-adjusted Precision-Recall curves at realistic field anomaly prevalence ($\pi = 5\%$) on \texttt{dataset\_02}, demonstrating the wide precision margin of \texttt{CARLA-Transformer (SSA)} ($\text{PR-AUC}_{\pi=0.05} = 0.9126$) over classical detectors and MSE/heuristic ablations at high recall. (b) 10-seed paired zero-label $\mathrm{F1}_{\mathrm{p97.5}}$ and $\text{PR-AUC}_{\pi=0.05}$ distributions (\texttt{mean \ensuremath{\pm} SD} with individual seed markers; $p = 0.00195$ across all non-physics pairs).}
 \label{fig:fig04}
 \end{figure*}
 
@@ -360,15 +365,15 @@ Finally, to understand \textit{how} \texttt{CARLA-Transformer (SSA)} achieves lo
 \begin{figure*}[!t]
 \centering
 \includegraphics[width=\textwidth]{fig08_attention_and_jacobian_saliency.pdf}
-\caption{Mechanistic attribution across $10$ seeds on \texttt{dataset\_02}: (a) Layer-averaged Multi-Head Self-Attention key routing shows that \texttt{AE-Transformer (MSE)} ($H = 0.8298$) and \texttt{CARLA-Transformer (Heuristic)} ($H = 0.8281$) collapse onto the load-dominated $1.01\,\text{kHz}$ resonance peak ($\sim 6.5\%$ per bin), whereas \texttt{CARLA-Transformer (SSA)} ($H = 0.9996 \pm 0.0002$) establishes a uniform all-to-all spectral reference bus ($0.99\%$ per bin). (b) Input-Jacobian score sensitivity $\|\nabla_{\mathbf{X}_k} a(\mathbf{X})\|_2$ reveals that \texttt{AE-Transformer} ($2.92\times$ band average, peaking near $7.9\times$) and \texttt{Heuristic} ($2.67\times$) amplify benign load resonance swings, whereas \texttt{CARLA-Transformer (SSA)} carves out a learned \textbf{resonance load-invariance notch} ($0.78\times\text{--}0.83\times$ suppressed sensitivity in $[0.7, 2.0]\,\text{kHz}$) alongside targeted DC and high-frequency diagnostic sensitivity.}
+\caption{Mechanistic attribution across $10$ seeds on \texttt{dataset\_02}: (a) Layer-averaged Multi-Head Self-Attention key routing shows that \texttt{AE-Transformer (MSE)} ($H = 0.8298$) and \texttt{CARLA-Transformer (Heuristic)} ($H = 0.8281$) collapse onto the load-dominated $1.01\,\text{kHz}$ resonance peak ($\sim 6.5\%$ per bin), whereas \texttt{CARLA-Transformer (SSA)} ($H = 0.9996 \pm 0.0002$) establishes a uniform all-to-all spectral reference bus ($0.99\%$ per bin). (b) Input-Jacobian score sensitivity $\|\nabla_{\mathbf{X}_k} a(\mathbf{X})\|_2$ reveals that \texttt{AE-Transformer} ($2.92{\times}$ band average, peaking near $7.9{\times}$) and \texttt{Heuristic} ($2.67{\times}$) amplify benign load resonance swings, whereas \texttt{CARLA-Transformer (SSA)} carves out a learned \textbf{resonance load-invariance notch} ($0.78{\times}\text{--}0.83{\times}$ suppressed sensitivity in $[0.7, 2.0]\,\text{kHz}$) alongside targeted DC and high-frequency diagnostic sensitivity.}
 \label{fig:fig08}
 \end{figure*}
 
 Figure~\ref{fig:fig08} exposes a striking two-level mechanistic divergence between physics-free and physics-informed self-attention:
 
 \begin{enumerate}
-\item \textbf{Elimination of Resonance Attention Collapse (Figure~\ref{fig:fig08}(a)):} Both \texttt{AE-Transformer (MSE)} ($H = 0.8298 \pm 0.0421$) and \texttt{CARLA-Transformer (Heuristic)} ($H = 0.8281 \pm 0.0423$) concentrate their self-attention keys sharply around $1.01\,\text{kHz}$ because resonant load swings dominate input variance. By contrast, \texttt{CARLA-Transformer (SSA)} achieves near-maximal normalized Shannon entropy ($H = 0.9996 \pm 0.0002$, band enrichment $0.988\times\text{--}1.011\times$ across DC, resonance, mid-inductive, and high-frequency ESR bands), turning self-attention into an \textbf{all-to-all spectral reference bus} so subsequent feed-forward layers can compute cross-decade gain/phase ratios.
-\item \textbf{The Resonance Load-Invariance Notch \& Fault-Aligned Routing (Figure~\ref{fig:fig08}(b)):} Whereas \texttt{AE-Transformer} and \texttt{CARLA (Heuristic)} suffer $2.92\times$ and $2.67\times$ Jacobian sensitivity spikes inside $[0.7, 2.0]\,\text{kHz}$, \texttt{CARLA-Transformer (SSA)} actively \textit{suppresses} resonant gradient sensitivity to $0.833\times \pm 0.086\times$ on healthy sweeps ($0.792\times$ on $\mathrm{ESR}_L$, $0.781\times$ on $R_{\mathrm{ds},1}$)---preventing benign $9\,\text{dB}$ $R_{\mathrm{out}}$ swings at $f_0$ from triggering false alarms. Simultaneously, for series ohmic faults ($\mathrm{ESR}_L$, $R_{\mathrm{ds},1}$), Jacobian enrichment peaks in the DC/low-frequency gain plateau ($100\text{--}400\,\text{Hz}$, enrichment \textbf{$1.234\times \pm 0.086\times$} and \textbf{$1.228\times \pm 0.085\times$}), while for $\mathrm{ESR}_C$ it routes into the mid-inductive and high-frequency zero transition ($2\text{--}50\,\text{kHz}$, enrichment \textbf{$1.080\times \pm 0.075\times$}).
+\item \textbf{Elimination of Resonance Attention Collapse (Figure~\ref{fig:fig08}(a)):} Both \texttt{AE-Transformer (MSE)} ($H = 0.8298 \pm 0.0421$) and \texttt{CARLA-Transformer (Heuristic)} ($H = 0.8281 \pm 0.0423$) concentrate their self-attention keys sharply around $1.01\,\text{kHz}$ because resonant load swings dominate input variance. By contrast, \texttt{CARLA-Transformer (SSA)} achieves near-maximal normalized Shannon entropy ($H = 0.9996 \pm 0.0002$, band enrichment $0.988{\times}\text{--}1.011{\times}$ across DC, resonance, mid-inductive, and high-frequency ESR bands), turning self-attention into an \textbf{all-to-all spectral reference bus} so subsequent feed-forward layers can compute cross-decade gain/phase ratios.
+\item \textbf{The Resonance Load-Invariance Notch \& Fault-Aligned Routing (Figure~\ref{fig:fig08}(b)):} Whereas \texttt{AE-Transformer} and \texttt{CARLA (Heuristic)} suffer $2.92{\times}$ and $2.67{\times}$ Jacobian sensitivity spikes inside $[0.7, 2.0]\,\text{kHz}$, \texttt{CARLA-Transformer (SSA)} actively \textit{suppresses} resonant gradient sensitivity to $(0.833 \pm 0.086){\times}$ on healthy sweeps ($0.792{\times}$ on $\mathrm{ESR}_L$, $0.781{\times}$ on $R_{\mathrm{ds},1}$)---preventing benign $9\,\text{dB}$ $R_{\mathrm{out}}$ swings at $f_0$ from triggering false alarms. Simultaneously, for series ohmic faults ($\mathrm{ESR}_L$, $R_{\mathrm{ds},1}$), Jacobian enrichment peaks in the DC/low-frequency gain plateau ($100\text{--}400\,\text{Hz}$, enrichment \textbf{$(1.234 \pm 0.086){\times}$} and \textbf{$(1.228 \pm 0.085){\times}$}), while for $\mathrm{ESR}_C$ it routes into the mid-inductive and high-frequency zero transition ($2\text{--}50\,\text{kHz}$, enrichment \textbf{$(1.080 \pm 0.075){\times}$}).
 \end{enumerate}
 
 \section{Discussion, Deployment Guidelines, and Limitations}\label{sec:7}
@@ -398,7 +403,7 @@ In accordance with rigorous engineering reporting, four concrete limitations bou
 
 Operating-load variation represents the primary physical barrier preventing laboratory FRA anomaly detectors from generalizing to field-deployed power converters. Using a $4\times$ variable-load switched Altair PSIM benchmark ($R_{\mathrm{out}} \in [2.0, 8.0]\,\Omega$) evaluated under strict zero-anomaly-label calibration (\texttt{p97.5}), we showed that benign $LC$ parallel-damping swings ($\sim 9\,\text{dB}$) cause raw $k$-NN, OC-SVM, MSE autoencoders, and generic time-series contrastive heuristics to miss $82.9\%\text{--}96.4\%$ of isolated resistive faults, while linear PCA residual subspaces suffer an unobservable cumulative-variance cliff and lose $16\text{--}29$ F1 points under $0.15\,\text{dB}$ FRA instrument jitter.
 
-By deriving an exact parasitic-drop State-Space Averaged Buck model ($0.0952\%$ median $L_2$ error vs. switched PSIM) and multiplying healthy variable-load spectra by nominal-load analytical fault transfer ratios $\tilde{H}(j\omega)/H^{(0)}(j\omega)$ inside a Multi-Head Self-Attention \texttt{CARLA-Transformer}, we disentangle component degradation from load damping \textbf{without online load sensors or faulty training data}. Across $10$ paired seeds, \texttt{CARLA-Transformer} achieves zero-label $\mathrm{F1}_{\mathrm{p97.5}} = 0.9417 \pm 0.0128$, $\text{PR-AUC}_{\pi=0.05} = 0.9126 \pm 0.0308$, $89.6\%$ $\mathrm{ESR}_C$ recall, and $92.4\%$ $\mathrm{ESR}_L$ recall, outperforms \texttt{LSTM}, \texttt{Conv1D}, \texttt{MLP}, and \texttt{GRU} encoders, retains $\mathrm{F1}_{\mathrm{p97.5}} = 0.9284$ under $0.15\,\text{dB}$ FRA noise, generalizes zero-shot to unseen fault families in Leave-One-Fault-Out tests, and mechanistically suppresses resonant load variance via an emergent $0.78\times\text{--}0.83\times$ Jacobian sensitivity notch around $f_0$.
+By deriving an exact parasitic-drop State-Space Averaged Buck model ($0.0952\%$ median $L_2$ error vs. switched PSIM) and multiplying healthy variable-load spectra by nominal-load analytical fault transfer ratios $\tilde{H}(j\omega)/H^{(0)}(j\omega)$ inside a Multi-Head Self-Attention \texttt{CARLA-Transformer}, we disentangle component degradation from load damping \textbf{without online load sensors or faulty training data}. Across $10$ paired seeds, \texttt{CARLA-Transformer} achieves zero-label $\mathrm{F1}_{\mathrm{p97.5}} = 0.9417 \pm 0.0128$, $\text{PR-AUC}_{\pi=0.05} = 0.9126 \pm 0.0308$, $89.6\%$ $\mathrm{ESR}_C$ recall, and $92.4\%$ $\mathrm{ESR}_L$ recall, outperforms \texttt{LSTM}, \texttt{Conv1D}, \texttt{MLP}, and \texttt{GRU} encoders, retains $\mathrm{F1}_{\mathrm{p97.5}} = 0.9284$ under $0.15\,\text{dB}$ FRA noise, generalizes zero-shot to unseen fault families in Leave-One-Fault-Out tests, and mechanistically suppresses resonant load variance via an emergent $0.78{\times}\text{--}0.83{\times}$ Jacobian sensitivity notch around $f_0$.
 
 \section*{Data and Code Availability}
 
