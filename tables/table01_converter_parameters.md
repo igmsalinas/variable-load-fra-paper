@@ -1,13 +1,17 @@
-**Table 1. Nominal electrical parameters, healthy manufacturing tolerance bands, degraded fault intervals, and variable operating-load range of the switched synchronous Buck converter benchmark (`dataset_02`).**
+**Table 1. Electrical parameters and fault intervals of the synchronous buck benchmark.**
 
-| Parameter | Symbol | Nominal Value | Healthy Tolerance Band | Degraded Fault Band(s) | Physical Role / Aging Mechanism |
-| :--- | :---: | :---: | :---: | :---: | :--- |
-| Input voltage | $V_{\mathrm{in}}$ | $50.0\,\mathrm{V}$ | Fixed | — | Regulated DC bus |
-| Duty cycle / Switching freq. | $D,\, f_s$ | $0.40,\, 100\,\mathrm{kHz}$ | Fixed ($t_{\mathrm{dead}} = 100\,\mathrm{ns}$) | — | Complementary PWM excitation |
-| Output capacitance | $C_{\mathrm{out}}$ | $100\,\mu\mathrm{F}$ | $\pm 7.5\%$ ($[92.5, 107.5]\,\mu\mathrm{F}$) | $[-45\%, -15\%] \cup [+15\%, +45\%]$ | Dielectric loss / film capacitance drift |
-| Capacitor ESR | $\mathrm{ESR}_C$ | $20\,\mathrm{m}\Omega$ | $\pm 20\%$ ($[16.0, 24.0]\,\mathrm{m}\Omega$) | $[+50\%, +200\%]$ ($[30, 60]\,\mathrm{m}\Omega$) | Electrolyte dry-out / contact aging |
-| Filter inductance | $L_{\mathrm{out}}$ | $200\,\mu\mathrm{H}$ | $\pm 7.5\%$ ($[185.0, 215.0]\,\mu\mathrm{H}$) | $[-45\%, -15\%] \cup [+15\%, +45\%]$ | Core permeability drift / partial saturation |
-| Inductor ESR | $\mathrm{ESR}_L$ | $100\,\mathrm{m}\Omega$ | $\pm 27.5\%$ ($[72.5, 127.5]\,\mathrm{m}\Omega$) | $[+50\%, +200\%]$ ($[150, 300]\,\mathrm{m}\Omega$) | Winding/solder contact degradation |
-| High-side MOSFET $R_{\mathrm{ds(on)}}$ | $R_{\mathrm{ds},1}$ | $10\,\mathrm{m}\Omega$ | $\pm 27.5\%$ ($[7.25, 12.75]\,\mathrm{m}\Omega$) | $[+80\%, +560\%]$ ($[18, 66]\,\mathrm{m}\Omega$) | Bond-wire lift / thermal die fatigue |
-| Sync-rectifier MOSFET $R_{\mathrm{ds(on)}}$ | $R_{\mathrm{ds},2}$ | $10\,\mathrm{m}\Omega$ | Clamped in PSIM | Unobservable via $V_{\mathrm{out}}$ FRA | Clamped by antiparallel body diode (Sec. 3.3) |
-| **Operating load resistance** | $R_{\mathrm{out}}$ | $4.0\,\Omega$ | **$[-50\%, +100\%]$ ($[2.0, 8.0]\,\Omega$)** | **$[-50\%, +100\%]$ ($[2.0, 8.0]\,\Omega$)** | **Legitimate $4\times$ load variation ($2.5\text{--}10\,\mathrm{A}$)** |
+| Parameter | Symbol | Nominal | Healthy range | Fault range |
+| --- | --- | --- | --- | --- |
+| Input voltage | $V_{\mathrm{in}}$ | $50.0\,\mathrm{V}$ | Fixed | — |
+| Duty ratio | $D$ | $0.40$ | Fixed | — |
+| Switching frequency | $f_s$ | $100\,\mathrm{kHz}$ | Fixed | — |
+| Dead time | $t_{\mathrm{dead}}$ | $100\,\mathrm{ns}$ | Fixed | — |
+| Output capacitance | $C_{\mathrm{out}}$ | $100\,\mu\mathrm{F}$ | $92.5$–$107.5\,\mu\mathrm{F}$ | $[55, 85]\cup[115, 145]\,\mu\mathrm{F}$ |
+| Capacitor ESR | $\mathrm{ESR}_C$ | $20\,\mathrm{m}\Omega$ | $16$–$24\,\mathrm{m}\Omega$ | $30$–$60\,\mathrm{m}\Omega$ |
+| Filter inductance | $L_{\mathrm{out}}$ | $200\,\mu\mathrm{H}$ | $185$–$215\,\mu\mathrm{H}$ | $[110, 170]\cup[230, 290]\,\mu\mathrm{H}$ |
+| Inductor ESR | $\mathrm{ESR}_L$ | $100\,\mathrm{m}\Omega$ | $72.5$–$127.5\,\mathrm{m}\Omega$ | $150$–$300\,\mathrm{m}\Omega$ |
+| High-side on-resistance | $R_{\mathrm{ds},1}$ | $10\,\mathrm{m}\Omega$ | $7.25$–$12.75\,\mathrm{m}\Omega$ | $18$–$66\,\mathrm{m}\Omega$ |
+| Low-side on-resistance | $R_{\mathrm{ds},2}$ | $10\,\mathrm{m}\Omega$ | See text | Excluded |
+| Operating load | $R_{\mathrm{out}}$ | $4.0\,\Omega$ | $2.0$–$8.0\,\Omega$ | $2.0$–$8.0\,\Omega$ |
+
+The operating-load range applies to both healthy and faulty sweeps in the variable-load benchmark.
