@@ -38,7 +38,7 @@ def arrow(ax, start, end, color=INK, width=0.85):
 
 
 def panel(ax, x, y, title, right):
-    label(ax, x, y, title, size=10.2, weight="bold")
+    label(ax, x, y, title, size=7.5, weight="bold")
     line(ax, [(x, y - 10), (right, y - 10)], RULE, 0.65)
 
 
