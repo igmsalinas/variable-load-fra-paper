@@ -45,7 +45,7 @@ The study makes three contributions. First, it derives a conduction-loss model a
 \begin{figure*}[tp]
 \centering
 \includegraphics[width=\textwidth]{fig01_system_and_carla_framework.pdf}
-\caption{Frequency-response monitoring under variable load. (a) Synchronous buck stage and frequency-response measurement channels. (b) An unmodified healthy sweep provides the anchor, a small perturbation forms the positive view, and multiplication by the nominal-load transfer-function ratio produces the synthetic fault view. (c) The anomaly score is the mean distance to the five nearest healthy training embeddings. The decision threshold is the 97.5th percentile of healthy validation scores. The spectra and embedding positions are schematic.}
+\caption{Frequency-response monitoring under variable load. (a) Synchronous buck stage and frequency-response measurement channels. (b) An unmodified healthy sweep provides the anchor, a small perturbation forms the positive view, and multiplication by the nominal-load transfer-function ratio produces the synthetic fault view. (c) The anomaly score is the mean distance to the five nearest healthy training embeddings. The decision threshold is the 97.5th percentile of healthy validation scores.}
 \label{fig:fig01}
 \end{figure*}
 
@@ -149,7 +149,7 @@ The decoder $g$ reconstructs the healthy input from $\mathbf h$ using two self-a
 \begin{figure*}[tp]
 \centering
 \includegraphics[width=\textwidth]{fig03_carla_transformer_architecture.pdf}
-\caption{Contrastive autoencoder architecture. (a) A shared self-attention encoder maps the 101 two-channel frequency tokens of each view to a 128-dimensional latent vector. (b) The decoder reconstructs healthy anchors during training. (c) The projection head maps all training views to unit-length embeddings. The positions illustrate the contrastive objective, and the same projection head supplies embeddings for anomaly scoring.}
+\caption{Contrastive autoencoder architecture. (a) A shared self-attention encoder maps the 101 two-channel frequency tokens of each view to a 128-dimensional latent vector. (b) The decoder reconstructs healthy anchors during training. (c) The projection head maps all training views to unit-length embeddings. The embeddings support contrastive training and nearest-neighbor scoring at inference.}
 \label{fig:fig03}
 \end{figure*}
 
