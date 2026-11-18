@@ -1,0 +1,23 @@
+figures/source/draw_method_figures.py
+  s_066a1cbbd1b060::t_fb72921173bf93 7,10-13,34,37,45-53,124-125,128-163,168-219
+main.tex
+  s_066a1cbbd1b060::t_0ce1a7a26ce486 48,152
+manuscript.md
+  s_066a1cbbd1b060::t_88c4ee33cfe6ab 45,169
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "f53f2e5cea790ec70dca4ff0da198092e0f5b5c7",
+  "prompts": {},
+  "sessions": {
+    "s_066a1cbbd1b060": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1ede1-6a93-7d00-b934-9f7cce57ac7d",
+        "model": "gpt-6.2-sol"
+      },
+      "human_author": "Ignacio Martin Salinas <ignacioms@inditex.com>"
+    }
+  }
+}
