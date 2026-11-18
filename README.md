@@ -1,10 +1,18 @@
-# Disentangling Component Degradation from Operating-Load Variations in Power-Converter Frequency Responses
+# Detecting Component Degradation Under Variable Load From Buck Converter Frequency Responses
 
-Overleaf-ready IEEE `IEEEtran` LaTeX repository synchronized from `fault_converters/papers/variable_load_fra_ad/`.
+IEEE journal manuscript on physics-informed anomaly detection from simulated buck converter frequency responses.
 
-## Contents
-- `main.tex`: Main IEEE `IEEEtran` manuscript referencing vector `.pdf` figures and standalone `.tex` tables.
-- `references.bib`: BibTeX bibliography.
-- `figures/`: 8 publication figures (`fig01`--`fig08`, vector `.pdf` + 300-DPI `.png`).
-- `tables/`: 7 standalone tables (`table01`--`table07`, `.tex`, `.csv`, `.md`).
-- `manuscript.md`: Format-agnostic source manuscript.
+- `main.tex` is the IEEE manuscript source.
+- `manuscript.md` is the Markdown edition.
+- `references.bib` contains the bibliography.
+- `figures/` contains nine figures in vector PDF and 300 dpi PNG.
+- `tables/` contains seven tables in LaTeX, Markdown, and CSV.
+
+Build `main.tex` with the IEEEtran document class and BibTeX bibliography style. The repository can also be opened as an Overleaf project.
+
+## Review and reproducibility
+
+- [Manuscript review and figure verification](REVIEW.md)
+- [GitHub and Git LFS availability template](DATA_CODE_AVAILABILITY.md)
+
+Figures 1 and 3 are vector schematics. Run `python3 figures/source/draw_method_figures.py` with Matplotlib and NumPy to regenerate their PDF and PNG versions.

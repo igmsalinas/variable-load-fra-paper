@@ -1,22 +1,42 @@
-\begin{table*}[t]
+\begin{table*}[!t]
 \centering
-\caption{Zero-anomaly-label ({\upshape\ttfamily p97.5}) anomaly detection performance on the variable-load benchmark ({\upshape\ttfamily dataset\_02}, $R_{\mathrm{out}} \in [2, 8]\,\Omega$). Deep models report mean $\pm$ SD over 10 random seeds; {\upshape\ttfamily Supervised GBM Oracle} uses 90 labeled validation anomalies solely as a supervised reference.}
+\caption{Detection performance on the variable-load benchmark.}
 \label{tab:variable_load_benchmark}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lcccccrrrrrr}
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.17}
+\textit{(a) Aggregate detection metrics}\par\smallskip
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lccccc@{}}
 \toprule
-Detector / Paradigm & Uses Fault Labels? & $\mathrm{F1}_{\mathrm{p97.5}}$ & $\mathrm{F1}_{\mathrm{p95}}$ & $\mathrm{PR\text{-}AUC}_{\pi=0.05}$ & $\mathrm{ROC\text{-}AUC}$ & $C_{\mathrm{out}}$ Rec. & $\mathrm{ESR}_C$ Rec. & $L_{\mathrm{out}}$ Rec. & $\mathrm{ESR}_L$ Rec. & $R_{\mathrm{ds},1}$ Rec. & Multi Rec. \\
+Detector & Use of fault labels & $\Fmain$ & $\Falt$ & $\AP$ & ROC AUC \\
 \midrule
-\texttt{One-Class SVM (RBF)} & No & 0.6892 & 0.6951 & 0.5434 & 0.7730 & 91.3\% & 3.6\% & 90.9\% & 4.8\% & 0.0\% & 71.1\% \\
-\texttt{Raw k-NN (k=5)} & No & 0.7112 & 0.7087 & 0.6268 & 0.8716 & 91.3\% & 3.6\% & 90.9\% & 4.8\% & 0.0\% & 76.3\% \\
-\texttt{Mahalanobis (Ridge 1e-6)} & No & 0.7638 & 0.8274 & 0.7086 & 0.9246 & 91.3\% & 21.4\% & 90.9\% & 4.8\% & 5.3\% & 84.5\% \\
-\texttt{Isolation Forest (200)} & No & 0.8347 & 0.8962 & 0.7289 & 0.9293 & 100.0\% & 60.7\% & 95.5\% & 19.0\% & 10.5\% & 89.7\% \\
-\texttt{Mahalanobis (Ledoit-Wolf)} & No & 0.8992 & 0.9196 & 0.7874 & 0.9582 & 100.0\% & 71.4\% & 95.5\% & 66.7\% & 15.8\% & 95.9\% \\
-\texttt{PCA (99\% Var., d=4)} & No & 0.7493 & 0.7608 & 0.6602 & 0.8993 & 95.7\% & 14.3\% & 90.9\% & 9.5\% & 0.0\% & 81.4\% \\
-\texttt{PCA (Oracle d=10, Clean)} & Oracle $d$ & 0.9347 & 0.9453 & 0.8538 & 0.9703 & 95.7\% & 89.3\% & 95.5\% & 90.5\% & 21.1\% & 97.9\% \\
-\textbf{\texttt{CARLA-Transformer (SSA)}} & \textbf{No} & \textbf{0.9417 $\pm$ 0.0128} & \textbf{0.9433 $\pm$ 0.0095} & \textbf{0.9126 $\pm$ 0.0308} & \textbf{0.9740 $\pm$ 0.0064} & \textbf{100.0\%} & \textbf{89.6\%} & \textbf{91.8\%} & \textbf{92.4\%} & \textbf{36.3\%} & \textbf{97.4\%} \\
-\textit{\texttt{Supervised GBM Oracle}} & \textit{Yes (90 faults)} & \textit{0.9340} & \textit{---} & \textit{0.9322} & \textit{0.9797} & \textit{87.0\%} & \textit{100.0\%} & \textit{90.9\%} & \textit{81.0\%} & \textit{15.8\%} & \textit{99.0\%} \\
+One-class SVM & None & $0.6892$ & $0.6951$ & $0.5434$ & $0.7730$ \\
+Raw $k$-NN ($k=5$) & None & $0.7112$ & $0.7087$ & $0.6268$ & $0.8716$ \\
+Mahalanobis (ridge) & None & $0.7638$ & $0.8274$ & $0.7086$ & $0.9246$ \\
+Isolation forest & None & $0.8347$ & $0.8962$ & $0.7289$ & $0.9293$ \\
+Mahalanobis (Ledoit--Wolf) & None & $0.8992$ & $0.9196$ & $0.7874$ & $0.9582$ \\
+PCA (99\% variance, rank 4) & None & $0.7493$ & $0.7608$ & $0.6602$ & $0.8993$ \\
+PCA (retrospective rank 10) & Rank selection & $0.9347$ & $0.9453$ & $0.8538$ & $0.9703$ \\
+Transformer, SSA negatives & None & $0.9417 \pm 0.0128$ & $0.9433 \pm 0.0095$ & $0.9126 \pm 0.0308$ & $0.9740 \pm 0.0064$ \\
+Supervised gradient boosting & Training (90 faults) & $0.9340$ & --- & $0.9322$ & $0.9797$ \\
 \bottomrule
-\end{tabular}%
-}
+\end{tabular*}
+\par\smallskip
+\textit{(b) Recall by fault type at the 97.5th percentile (\%)}\par\smallskip
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lcccccc@{}}
+\toprule
+Detector & $C_{\mathrm{out}}$ & $\mathrm{ESR}_C$ & $L_{\mathrm{out}}$ & $\mathrm{ESR}_L$ & $R_{\mathrm{ds},1}$ & Compound \\
+\midrule
+One-class SVM & $91.3$ & $3.6$ & $90.9$ & $4.8$ & $0.0$ & $71.1$ \\
+Raw $k$-NN ($k=5$) & $91.3$ & $3.6$ & $90.9$ & $4.8$ & $0.0$ & $76.3$ \\
+Mahalanobis (ridge) & $91.3$ & $21.4$ & $90.9$ & $4.8$ & $5.3$ & $84.5$ \\
+Isolation forest & $100.0$ & $60.7$ & $95.5$ & $19.0$ & $10.5$ & $89.7$ \\
+Mahalanobis (Ledoit--Wolf) & $100.0$ & $71.4$ & $95.5$ & $66.7$ & $15.8$ & $95.9$ \\
+PCA (99\% variance, rank 4) & $95.7$ & $14.3$ & $90.9$ & $9.5$ & $0.0$ & $81.4$ \\
+PCA (retrospective rank 10) & $95.7$ & $89.3$ & $95.5$ & $90.5$ & $21.1$ & $97.9$ \\
+Transformer, SSA negatives & $100.0$ & $89.6$ & $91.8$ & $92.4$ & $36.3$ & $97.4$ \\
+Supervised gradient boosting & $87.0$ & $100.0$ & $90.9$ & $81.0$ & $15.8$ & $99.0$ \\
+\bottomrule
+\end{tabular*}
+\par\smallskip\parbox{\textwidth}{Transformer values are means over ten runs. Panel (a) reports mean $\pm$ SD. The supervised F1 and recalls use its own decision rule.}
 \end{table*}
