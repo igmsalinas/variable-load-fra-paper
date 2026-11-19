@@ -1,0 +1,25 @@
+DATA_CODE_AVAILABILITY.md
+  s_066a1cbbd1b060::t_6bfa04779d0234 5
+manuscript.md
+  s_066a1cbbd1b060::t_59b42f86613bc4 35,49,51,53,176,272
+main.tex
+  s_066a1cbbd1b060::t_99fcda8d1cce0d 35,52,54,56,162,253,259-260
+references.bib
+  s_066a1cbbd1b060::t_355deb135dc86c 228-313
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "73f6dd1d321ca6ad371791fd4dffc8c268b53d79",
+  "prompts": {},
+  "sessions": {
+    "s_066a1cbbd1b060": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1ede1-6a93-7d00-b934-9f7cce57ac7d",
+        "model": "gpt-6.2-sol"
+      },
+      "human_author": "Ignacio Martin Salinas <ignacioms@inditex.com>"
+    }
+  }
+}
