@@ -1,0 +1,39 @@
+README.md
+  s_066a1cbbd1b060::t_431822db4ec771 5,10
+REVIEW.md
+  s_066a1cbbd1b060::t_a94e4daae01f3c 21-22,24,28
+main.tex
+  s_066a1cbbd1b060::t_a0821a95aef759 41,170,184,199,206,217,219,221,223,225,227,229,231,233,235,237,253
+manuscript.md
+  s_066a1cbbd1b060::t_4ad10cd186abc6 41,183,197,211,215,217,219-221,236,240,244,246,248,250,256,272
+tables/table02_variable_load_benchmark.md
+  s_066a1cbbd1b060::t_1d4164f70d931a 1
+tables/table02_variable_load_summary.tex
+  s_066a1cbbd1b060::t_eabc00646f3db9 22
+tables/table03_10seed_contrastive_ablation.md
+  s_066a1cbbd1b060::t_7ff28492e8e4b7 1
+tables/table04_encoder_backbone_comparison.md
+  s_066a1cbbd1b060::t_3e554c3fef891c 1
+tables/table05_representation_vs_scorer_matrix.md
+  s_066a1cbbd1b060::t_4f91bec22427bc 1
+tables/table06_fra_noise_robustness_sweep.md
+  s_066a1cbbd1b060::t_918cbb9811ef9b 1
+tables/table07_lofo_generalization.md
+  s_066a1cbbd1b060::t_7c9ccd0c21e7d8 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "d35c19bec7a1f84fc703b2608dd41d4d7c9f6b4a",
+  "prompts": {},
+  "sessions": {
+    "s_066a1cbbd1b060": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1ede1-6a93-7d00-b934-9f7cce57ac7d",
+        "model": "gpt-6.2-sol"
+      },
+      "human_author": "Ignacio Martin Salinas <ignacioms@inditex.com>"
+    }
+  }
+}
