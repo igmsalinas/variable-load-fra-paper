@@ -269,7 +269,11 @@ An autoencoder with physics-informed contrastive augmentation improved detection
 
 ## Data and Code Availability
 
-The experiment code and summary results are archived in the [code repository](https://github.com/igmsalinas/fault-converters-code/tree/9e13ccdd263346e2eadd15102fe096393a64d38a). The variable-load sweeps, manifest, split, and saved run artifacts are archived in the [data repository](https://github.com/igmsalinas/fault-converters-data/tree/4950ecf604fab8b63395201b2d4a28af88fae8e8). Access requires repository permissions. Large artifacts use Git LFS. The fixed-load results are available as saved outputs, and the raw fixed-load cohort remains to be archived.
+- **Experiment code and summary results.** [github.com/igmsalinas/fault-converters-code](https://github.com/igmsalinas/fault-converters-code) (revision [9e13ccd](https://github.com/igmsalinas/fault-converters-code/tree/9e13ccdd263346e2eadd15102fe096393a64d38a)).
+- **Variable-load sweeps, manifest, split, and saved runs.** [github.com/igmsalinas/fault-converters-data](https://github.com/igmsalinas/fault-converters-data) (revision [4950ecf](https://github.com/igmsalinas/fault-converters-data/tree/4950ecf604fab8b63395201b2d4a28af88fae8e8)).
+- **LaTeX manuscript, figures, and tables.** [github.com/igmsalinas/variable-load-fra-paper](https://github.com/igmsalinas/variable-load-fra-paper).
+
+Repository access requires GitHub permissions. Large data artifacts use Git LFS. The fixed-load evaluation records are archived with the data. The exact raw fixed-load cohort remains to be archived.
 
 ## Acknowledgment
 
