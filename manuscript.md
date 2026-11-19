@@ -269,7 +269,7 @@ An autoencoder with physics-informed contrastive augmentation improved detection
 
 ## Data and Code Availability
 
-The experiment code and summary results are publicly available in [fault-converters-code](https://github.com/igmsalinas/fault-converters-code) (revision [9e13ccd](https://github.com/igmsalinas/fault-converters-code/tree/9e13ccdd263346e2eadd15102fe096393a64d38a)). The variable-load sweeps, manifest, split, and saved runs are available in [fault-converters-data](https://github.com/igmsalinas/fault-converters-data) (revision [4950ecf](https://github.com/igmsalinas/fault-converters-data/tree/4950ecf604fab8b63395201b2d4a28af88fae8e8)), with large artifacts stored through Git LFS. The data repository also contains the fixed-load evaluation records. The exact raw fixed-load cohort remains to be archived.
+The experiment code and summary results are publicly available in [fault-converters-code](https://github.com/igmsalinas/fault-converters-code). The [fault-converters-data](https://github.com/igmsalinas/fault-converters-data) repository contains the variable-load sweeps, manifest, split, and saved runs, as well as fixed-load evaluation records. Large data artifacts use Git LFS.
 
 ## Acknowledgment
 
