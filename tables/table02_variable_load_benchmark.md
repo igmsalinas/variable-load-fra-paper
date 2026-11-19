@@ -1,4 +1,4 @@
-**Table 2. Detection performance on the variable-load benchmark.**
+**Supplementary Table S1. Detection performance on the variable-load benchmark.**
 
 **(a) Aggregate detection metrics**
 

@@ -58,23 +58,18 @@ Contrastive methods use the choice of positive and negative pairs to shape the r
 
 The synchronous buck converter operates at a nominal duty ratio $D=0.40$, input voltage $V_{\mathrm{in}}=50\,\mathrm{V}$, and switching frequency $f_s=100\,\mathrm{kHz}$. Table 1 gives the nominal parameters and prescribed simulation intervals for the variable-load benchmark. The fixed-load benchmark uses $R_{\mathrm{out}}=4\,\Omega$. The variable-load benchmark spans $2$–$8\,\Omega$, equivalent to approximately $2.5$–$10\,\mathrm{A}$ at the ideal output voltage of $20\,\mathrm{V}$.
 
-**Table 1. Electrical parameters and prescribed simulation intervals for the variable-load benchmark.**
+**Table 1. Variable-load simulation parameters.**
 
-| Parameter | Symbol | Nominal | Healthy range | Fault range |
-| --- | --- | --- | --- | --- |
-| Input voltage | $V_{\mathrm{in}}$ | $50.0\,\mathrm{V}$ | Fixed | — |
-| Duty ratio | $D$ | $0.40$ | Fixed | — |
-| Switching frequency | $f_s$ | $100\,\mathrm{kHz}$ | Fixed | — |
-| Dead time | $t_{\mathrm{dead}}$ | $100\,\mathrm{ns}$ | Fixed | — |
-| Output capacitance | $C_{\mathrm{out}}$ | $100\,\mu\mathrm{F}$ | $80$–$120\,\mu\mathrm{F}$ | $30$–$70\,\mu\mathrm{F}$ |
-| Capacitor ESR | $\mathrm{ESR}_C$ | $20\,\mathrm{m}\Omega$ | $10$–$40\,\mathrm{m}\Omega$ | $60$–$160\,\mathrm{m}\Omega$ |
-| Filter inductance | $L_{\mathrm{out}}$ | $200\,\mu\mathrm{H}$ | $160$–$240\,\mu\mathrm{H}$ | $80$–$140\,\mu\mathrm{H}$ |
-| Inductor ESR | $\mathrm{ESR}_L$ | $100\,\mathrm{m}\Omega$ | $85$–$140\,\mathrm{m}\Omega$ | $200$–$600\,\mathrm{m}\Omega$ |
-| High-side on-resistance | $R_{\mathrm{ds},1}$ | $10\,\mathrm{m}\Omega$ | $10$–$22\,\mathrm{m}\Omega$ | $30$–$150\,\mathrm{m}\Omega$ |
-| Low-side on-resistance | $R_{\mathrm{ds},2}$ | $10\,\mathrm{m}\Omega$ | See text | Excluded |
-| Operating load | $R_{\mathrm{out}}$ | $4.0\,\Omega$ | $2.0$–$8.0\,\Omega$ | $2.0$–$8.0\,\Omega$ |
+| Parameter (unit) | Nominal | Healthy | Fault |
+| --- | ---: | ---: | ---: |
+| $C_{\mathrm{out}}$ ($\mu\mathrm{F}$) | 100 | 80–120 | 30–70 |
+| $\mathrm{ESR}_C$ ($\mathrm{m}\Omega$) | 20 | 10–40 | 60–160 |
+| $L_{\mathrm{out}}$ ($\mu\mathrm{H}$) | 200 | 160–240 | 80–140 |
+| $\mathrm{ESR}_L$ ($\mathrm{m}\Omega$) | 100 | 85–140 | 200–600 |
+| $R_{\mathrm{ds},1}$ ($\mathrm{m}\Omega$) | 10 | 10–22 | 30–150 |
+| $R_{\mathrm{out}}$ ($\Omega$) | 4 | 2–8 | 2–8 |
 
-Each fault interval applies when the corresponding component is degraded. The load varies in both classes.
+Fault intervals apply to degraded components. Load varies in both classes.
 
 In the ideal buck model, the coefficient of $s$ in the monic denominator includes $1/(R_{\mathrm{out}} C_{\mathrm{out}})$, so changing $R_{\mathrm{out}}$ primarily changes resonance damping. The nominal undamped $LC$ frequency and capacitor ESR zero are
 $$
@@ -87,7 +82,7 @@ f_z &= \frac{1}{2\pi C_{\mathrm{out}}^{(0)}\mathrm{ESR}_C^{(0)}}
 $$
 Superscript $(0)$ denotes nominal values. Reducing the capacitance or inductance raises the undamped frequency, while increasing capacitor ESR moves its zero toward the measured band.
 
-Each sweep contains $N_f=101$ logarithmically spaced points from $100\,\mathrm{Hz}$ to $50\,\mathrm{kHz}$. The upper endpoint is half the switching frequency. Healthy component tolerances and variable load were sampled using Latin hypercube sampling [@mckay1979comparison]. The fault intervals are separated from the healthy intervals by design. At the lightest load and minimum specified inductance of $80\,\mu\mathrm{H}$, the ideal peak-to-peak inductor ripple is about $1.50\,\mathrm{A}$, giving an estimated valley current of $1.75\,\mathrm{A}$. This estimate supports the continuous-conduction-mode assumption over the specified range.
+The simulated dead time is $100\,\mathrm{ns}$ and the nominal low-side on-resistance is $10\,\mathrm{m}\Omega$. Each sweep contains $N_f=101$ logarithmically spaced points from $100\,\mathrm{Hz}$ to $50\,\mathrm{kHz}$. The upper endpoint is half the switching frequency. Healthy component tolerances and variable load were sampled using Latin hypercube sampling [@mckay1979comparison]. The fault intervals are separated from the healthy intervals by design. At the lightest load and minimum specified inductance of $80\,\mu\mathrm{H}$, the ideal peak-to-peak inductor ripple is about $1.50\,\mathrm{A}$, giving an estimated valley current of $1.75\,\mathrm{A}$. This estimate supports the continuous-conduction-mode assumption over the specified range.
 
 ### 3.2. Averaged Control-to-Output Response
 
@@ -219,185 +214,61 @@ Results across seeds are summarized by the mean and standard deviation (SD). The
 
 ### 6.1. Fixed- and Variable-Load Benchmarks
 
-At fixed load, raw nearest-neighbor scoring ($k=1$) achieves $\mathrm{F1}_{0.975}=0.9244$ and $\mathrm{AP}_{0.05}=0.8031$. The convolutional encoder trained with SSA-ratio augmentation achieves $0.9399\pm0.0033$ and $0.8332\pm0.0058$, respectively. On the variable-load benchmark, raw nearest-neighbor F1 is $0.7134$ with $k=1$ and $0.7112$ with $k=5$. Fig. 4(a) summarizes the results on the two benchmarks. The benchmarks also differ in sample size and composition, so the cross-benchmark comparison does not isolate a causal effect of load on F1.
+At fixed load, raw nearest-neighbor scoring ($k=1$) achieves $\mathrm{F1}_{0.975}=0.9244$ and $\mathrm{AP}_{0.05}=0.8031$. The convolutional encoder trained with SSA-ratio augmentation achieves $0.9399\pm0.0033$ and $0.8332\pm0.0058$, respectively. On the variable-load benchmark, raw nearest-neighbor F1 is $0.7134$ with $k=1$ and $0.7112$ with $k=5$. The benchmarks also differ in sample size and composition, so the cross-benchmark comparison does not isolate a causal effect of load on F1.
 
-![Figure 4. Detection under fixed and variable load.](figures/fig04_ds01_vs_ds02_and_fault_recall.png)
+Table 2 summarizes the aggregate variable-load results. Raw $k$-NN detects approximately $91\%$ of isolated capacitance and inductance faults but only $3.6\%$ of capacitor ESR faults and $4.8\%$ of inductor ESR faults ([Supplementary Table S1](tables/table02_variable_load_benchmark.md)). Ledoit–Wolf Mahalanobis scoring improves F1 to $0.8992$ but detects $71.4\%$ and $66.7\%$ of those two fault types, respectively. The Transformer trained with SSA-ratio augmentation achieves $\mathrm{F1}_{0.975}=0.9417\pm0.0128$, $\mathrm{AP}_{0.05}=0.9126\pm0.0308$, and ROC AUC of $0.9740\pm0.0064$. It flags 0 to 6 of the 100 healthy test sweeps across the ten seeds. Its precision and recall at the benchmark class balance are $0.9870\pm0.0102$ and $0.9005\pm0.0192$. The supervised reference has a similar F1 of $0.9340$ and higher average precision of $0.9322$. High-side switch recall remains modest at $36.3\%$ for the SSA-ratio model.
 
-**Figure 4.** Detection under fixed and variable load. (a) F1 at the healthy validation 97.5th percentile on the two benchmarks. (b) Recall on the variable-load test split at the same calibration percentile, by fault type. Error bars for neural models indicate standard deviations across seeds. Sample counts appear below the fault labels.
+**Table 2. Detection performance under variable load.**
 
-On the variable-load test split, raw $k$-NN detects approximately $91\%$ of isolated capacitance and inductance faults but only $3.6\%$ of capacitor ESR faults and $4.8\%$ of inductor ESR faults [Table 2 and Fig. 4(b)]. Ledoit–Wolf Mahalanobis scoring improves F1 to $0.8992$ but detects $71.4\%$ and $66.7\%$ of those two fault types, respectively. The Transformer trained with SSA-ratio augmentation achieves $\mathrm{F1}_{0.975}=0.9417\pm0.0128$, $\mathrm{AP}_{0.05}=0.9126\pm0.0308$, and ROC AUC of $0.9740\pm0.0064$. It flags 0 to 6 of the 100 healthy test sweeps across the ten seeds. Its precision and recall at the benchmark class balance are $0.9870\pm0.0102$ and $0.9005\pm0.0192$. The supervised reference has a similar F1 of $0.9340$ and higher average precision of $0.9322$. High-side switch recall remains modest at $36.3\%$ for the SSA-ratio model.
+| Detector | $\mathrm{F1}_{0.975}$ | $\mathrm{AP}_{0.05}$ |
+| --- | ---: | ---: |
+| One-class SVM | 0.6892 | 0.5434 |
+| Raw $k$-NN ($k=5$) | 0.7112 | 0.6268 |
+| Mahalanobis (ridge) | 0.7638 | 0.7086 |
+| Isolation forest | 0.8347 | 0.7289 |
+| Mahalanobis (Ledoit–Wolf) | 0.8992 | 0.7874 |
+| PCA (99% variance, rank 4) | 0.7493 | 0.6602 |
+| Transformer, SSA negatives | $0.9417\pm0.0128$ | $0.9126\pm0.0308$ |
+| PCA (retrospective rank 10) | 0.9347 | 0.8538 |
+| Supervised gradient boosting | 0.9340 | 0.9322 |
 
-**Table 2. Detection performance on the variable-load benchmark.**
-
-**(a) Aggregate detection metrics**
-
-| Detector | Use of fault labels | $\mathrm{F1}_{0.975}$ | $\mathrm{F1}_{0.95}$ | $\mathrm{AP}_{0.05}$ | ROC AUC |
-| --- | --- | --- | --- | --- | --- |
-| One-class SVM | None | 0.6892 | 0.6951 | 0.5434 | 0.7730 |
-| Raw $k$-NN ($k=5$) | None | 0.7112 | 0.7087 | 0.6268 | 0.8716 |
-| Mahalanobis (ridge) | None | 0.7638 | 0.8274 | 0.7086 | 0.9246 |
-| Isolation forest | None | 0.8347 | 0.8962 | 0.7289 | 0.9293 |
-| Mahalanobis (Ledoit–Wolf) | None | 0.8992 | 0.9196 | 0.7874 | 0.9582 |
-| PCA (99\% variance, rank 4) | None | 0.7493 | 0.7608 | 0.6602 | 0.8993 |
-| PCA (retrospective rank 10) | Rank selection | 0.9347 | 0.9453 | 0.8538 | 0.9703 |
-| Transformer, SSA negatives | None | 0.9417 ± 0.0128 | 0.9433 ± 0.0095 | 0.9126 ± 0.0308 | 0.9740 ± 0.0064 |
-| Supervised gradient boosting | Training (90 faults) | 0.9340 | — | 0.9322 | 0.9797 |
-
-**(b) Recall by fault type at the 97.5th percentile (\%)**
-
-| Detector | $C_{\mathrm{out}}$ | $\mathrm{ESR}_C$ | $L_{\mathrm{out}}$ | $\mathrm{ESR}_L$ | $R_{\mathrm{ds},1}$ | Compound |
-| --- | --- | --- | --- | --- | --- | --- |
-| One-class SVM | 91.3 | 3.6 | 90.9 | 4.8 | 0.0 | 71.1 |
-| Raw $k$-NN ($k=5$) | 91.3 | 3.6 | 90.9 | 4.8 | 0.0 | 76.3 |
-| Mahalanobis (ridge) | 91.3 | 21.4 | 90.9 | 4.8 | 5.3 | 84.5 |
-| Isolation forest | 100.0 | 60.7 | 95.5 | 19.0 | 10.5 | 89.7 |
-| Mahalanobis (Ledoit–Wolf) | 100.0 | 71.4 | 95.5 | 66.7 | 15.8 | 95.9 |
-| PCA (99\% variance, rank 4) | 95.7 | 14.3 | 90.9 | 9.5 | 0.0 | 81.4 |
-| PCA (retrospective rank 10) | 95.7 | 89.3 | 95.5 | 90.5 | 21.1 | 97.9 |
-| Transformer, SSA negatives | 100.0 | 89.6 | 91.8 | 92.4 | 36.3 | 97.4 |
-| Supervised gradient boosting | 87.0 | 100.0 | 90.9 | 81.0 | 15.8 | 99.0 |
-
-Transformer values are means over ten runs. Panel (a) reports mean $\pm$ SD. The supervised F1 and recalls use its own decision rule.
+Transformer results are mean $\pm$ SD over ten seeds. The last two rows use fault labels.
 
 ### 6.2. Effect of the Training Objective and Negative Samples
 
-Table 3 and Fig. 5 compare Transformer training regimes across ten paired seeds. Reconstruction-error scoring gives a mean F1 of $0.7540$ and mean capacitor and inductor ESR recalls of $13.2\%$ and $9.5\%$. Applying $k$-NN to the reconstruction-only latent representation reduces F1 to $0.7090$. Contrastive training with heuristic negatives gives F1 of $0.6868$ and adjusted average precision of $0.5272$.
+Fig. 4 and [Supplementary Table S2](tables/table03_10seed_contrastive_ablation.md) compare Transformer training regimes across ten paired seeds. Reconstruction-error scoring gives a mean F1 of $0.7540$ and mean capacitor and inductor ESR recalls of $13.2\%$ and $9.5\%$. Applying $k$-NN to the reconstruction-only latent representation reduces F1 to $0.7090$. Contrastive training with heuristic negatives gives F1 of $0.6868$ and adjusted average precision of $0.5272$.
 
 The SSA-ratio model improves F1 by $0.188$ to $0.255$ over the three ablations and has higher F1 in every paired run ($p=0.00195$ for each comparison, unadjusted). Mean recall reaches $89.6\%$ for capacitor ESR and $92.4\%$ for inductor ESR. The contrastive comparison holds the architecture and scorer fixed and varies the negative examples. The comparison with reconstruction-error scoring also changes the scorer.
 
-![Figure 5. Ranking performance and training ablation on the variable-load benchmark.](figures/fig05_pr_curves_and_10seed_ablation.png)
+![Figure 4. Ranking performance and training ablation on the variable-load benchmark.](figures/fig05_pr_curves_and_10seed_ablation.png)
 
-**Figure 5.** Ranking performance and training ablation on the variable-load benchmark. (a) Precision–recall curves adjusted to an assumed anomaly prevalence of $5\%$. AP is average precision. For a neural comparator, the curve is the run at the upper median of its ten AP values. The legend summarizes all seeds. (b) F1 at the healthy validation 97.5th percentile and prevalence-adjusted AP for the ten paired training runs. Bars show means, error bars show SDs, and dots give individual runs.
-
-**Table 3. Paired Transformer ablation on the variable-load benchmark over ten seeds.**
-
-| Training and scoring | $\mathrm{F1}_{0.975}$ | $\mathrm{AP}_{0.05}$ | ROC AUC |
-| --- | --- | --- | --- |
-| Reconstruction error | 0.7540 ± 0.0111 | 0.6640 ± 0.0153 | 0.9033 ± 0.0129 |
-| Reconstruction latent $k$-NN | 0.7090 ± 0.0067 | 0.6129 ± 0.0053 | 0.8190 ± 0.0114 |
-| Heuristic negatives | 0.6868 ± 0.0281 | 0.5272 ± 0.0529 | 0.8344 ± 0.0224 |
-| SSA negatives | 0.9417 ± 0.0128 | 0.9126 ± 0.0308 | 0.9740 ± 0.0064 |
-
-**Recall at the 97.5th percentile (\%)**
-
-| Training and scoring | Passive | $\mathrm{ESR}_C$ | $\mathrm{ESR}_L$ | $R_{\mathrm{ds},1}$ | $\Delta$F1 |
-| --- | --- | --- | --- | --- | --- |
-| Reconstruction error | 51.7 ± 2.0 | 13.2 ± 2.9 | 9.5 ± 6.3 | 3.2 ± 2.7 | $+0.1876$ |
-| Reconstruction latent $k$-NN | 45.4 ± 0.7 | 3.6 ± 0.0 | 4.8 ± 0.0 | 1.1 ± 2.2 | $+0.2327$ |
-| Heuristic negatives | 45.7 ± 3.8 | 17.1 ± 4.4 | 5.2 ± 3.5 | 6.8 ± 3.6 | $+0.2548$ |
-| SSA negatives | 93.3 ± 2.2 | 89.6 ± 7.2 | 92.4 ± 4.0 | 36.3 ± 10.4 | — |
-
-Values are mean $\pm$ SD. Passive recall pools the four passive single-fault strata. $\Delta$F1 is the mean paired improvement with SSA negatives. Each paired comparison gives $p=0.00195$ (unadjusted).
+**Figure 4.** Ranking performance and training ablation on the variable-load benchmark. (a) Precision–recall curves adjusted to an assumed anomaly prevalence of $5\%$. AP is average precision. For a neural comparator, the curve is the run at the upper median of its ten AP values. The legend summarizes all seeds. (b) F1 at the healthy validation 97.5th percentile and prevalence-adjusted AP for the ten paired training runs. Bars show means, error bars show SDs, and dots give individual runs.
 
 ### 6.3. Encoder Comparison
 
-With the same SSA-ratio augmentation, the Transformer has the highest mean F1 and AP among the five encoder configurations tested [Table 4 and Fig. 6(a)]. Its clean mean F1 is $0.9447$, compared with $0.8611$ for the LSTM and $0.8426$ for the convolutional encoder. The LSTM detects capacitor ESR faults more often than inductor ESR faults ($84.3\%$ versus $24.8\%$), while the Transformer reaches $90.0\%$ and $94.3\%$, respectively. The GRU has the largest seed-to-seed variation (F1 SD $0.3207$). These comparisons apply to the evaluated configurations and do not identify which architectural property accounts for the differences.
-
-![Figure 6. Encoder and scorer comparisons on the variable-load benchmark.](figures/fig06_encoder_backbones_and_scorer_matrix.png)
-
-**Figure 6.** Encoder and scorer comparisons on the variable-load benchmark. (a) Five encoder configurations with identical SSA-ratio augmentation, summarized over five seeds. Noisy F1 uses simulated jitter of $0.15\,\mathrm{dB}$ and $0.75^\circ$. Error bars indicate SDs. (b) F1 for four scorers applied to four representations, reported as mean $\pm$ SD over ten seeds.
-
-**Table 4. Encoder comparisons with the same SSA-ratio augmentation on the variable-load benchmark.**
-
-| Encoder | Clean $\mathrm{F1}_{0.975}$ | Noisy $\mathrm{F1}_{0.975}$ | $\mathrm{AP}_{0.05}$ | ROC AUC |
-| --- | --- | --- | --- | --- |
-| Transformer | 0.9447 ± 0.0133 | 0.9303 ± 0.0087 | 0.9195 ± 0.0283 | 0.9733 ± 0.0069 |
-| LSTM | 0.8611 ± 0.0144 | 0.8557 ± 0.0165 | 0.8053 ± 0.0100 | 0.9254 ± 0.0033 |
-| 1-D convolution | 0.8426 ± 0.0238 | 0.7451 ± 0.0165 | 0.7440 ± 0.0099 | 0.9188 ± 0.0083 |
-| MLP | 0.7739 ± 0.0210 | 0.7506 ± 0.0207 | 0.7227 ± 0.0322 | 0.9095 ± 0.0118 |
-| GRU | 0.5988 ± 0.3207 [0.8164] | 0.6021 ± 0.2965 [0.7910] | 0.5147 ± 0.3052 [0.6958] | 0.7904 ± 0.1128 [0.8632] |
-
-**Clean recall at the 97.5th percentile (\%)**
-
-| Encoder | $\mathrm{ESR}_C$ | $\mathrm{ESR}_L$ | $R_{\mathrm{ds},1}$ |
-| --- | --- | --- | --- |
-| Transformer | 90.0 ± 9.2 | 94.3 ± 2.1 | 38.9 ± 8.0 |
-| LSTM | 84.3 ± 11.5 | 24.8 ± 4.0 | 7.4 ± 4.7 |
-| 1-D convolution | 53.6 ± 13.4 | 50.5 ± 19.2 | 3.2 ± 4.7 |
-| MLP | 30.0 ± 10.6 | 17.1 ± 12.0 | 6.3 ± 6.9 |
-| GRU | 60.7 ± 52.2 | 7.6 ± 5.4 | 3.2 ± 4.7 |
-
-Values are mean $\pm$ SD over five seeds. Brackets give the GRU medians. The noisy condition uses $0.15\,\mathrm{dB}$ magnitude and $0.75^\circ$ phase jitter.
+With the same SSA-ratio augmentation, the Transformer has the highest mean F1 and AP among the five encoder configurations tested ([Supplementary Table S3](tables/table04_encoder_backbone_comparison.md)). Its clean mean F1 is $0.9447$, compared with $0.8611$ for the LSTM and $0.8426$ for the convolutional encoder. The LSTM detects capacitor ESR faults more often than inductor ESR faults ($84.3\%$ versus $24.8\%$), while the Transformer reaches $90.0\%$ and $94.3\%$, respectively. The GRU has the largest seed-to-seed variation (F1 SD $0.3207$). These comparisons apply to the evaluated configurations and do not identify which architectural property accounts for the differences.
 
 ### 6.4. Scoring, PCA Rank, and Noise Sensitivity
 
-Table 5 and Fig. 6(b) compare four scorers on the encoder representation $\mathbf h$ or normalized projection $\mathbf z$. For the SSA-ratio model, mean F1 ranges from $0.9204$ to $0.9504$ across these combinations. The heuristic-negative representation gives mean F1 between $0.6674$ and $0.8042$. The reconstruction-only representation reaches $0.9373$ with rank-10 PCA scoring, despite scoring $0.7090$ with $k$-NN. The benefit of SSA-ratio augmentation is therefore most consistent across scorers, and a favorable scorer can also improve a reconstruction-only representation.
+[Supplementary Table S4](tables/table05_representation_vs_scorer_matrix.md) compares four scorers on the encoder representation $\mathbf h$ or normalized projection $\mathbf z$. For the SSA-ratio model, mean F1 ranges from $0.9204$ to $0.9504$ across these combinations. The heuristic-negative representation gives mean F1 between $0.6674$ and $0.8042$. The reconstruction-only representation reaches $0.9373$ with rank-10 PCA scoring, despite scoring $0.7090$ with $k$-NN. The benefit of SSA-ratio augmentation is therefore most consistent across scorers, and a favorable scorer can also improve a reconstruction-only representation.
 
-**Table 5. Effects of representation and anomaly scoring on the variable-load benchmark.**
+PCA applied directly to the standardized spectra is sensitive to rank [Fig. 5(a)]. The healthy-data rules that retain at least $95\%$, $99\%$, and $99.5\%$ of variance select ranks 3, 4, and 5, with F1 scores of $0.7229$, $0.7493$, and $0.7347$. A retrospective rank sweep using labeled test performance reaches $0.9584$ at rank 8 under clean conditions. All three healthy-data variance rules select lower ranks.
 
-**$\mathrm{F1}_{0.975}$**
+![Figure 5. PCA rank and simulated measurement noise.](figures/fig07_pca_cliff_and_7level_fra_noise.png)
 
-| Representation | $k$-NN | Ledoit–Wolf | PCA (rank 5) | PCA (rank 10) |
-| --- | --- | --- | --- | --- |
-| Reconstruction ($\mathbf h$) | 0.7090 ± 0.0067 | 0.7671 ± 0.0289 | 0.8293 ± 0.0597 | 0.9373 ± 0.0208 |
-| Heuristic negatives ($\mathbf z$) | 0.6868 ± 0.0281 | 0.8042 ± 0.0247 | 0.6674 ± 0.0606 | 0.7343 ± 0.0425 |
-| SSA negatives ($\mathbf h$) | 0.9296 ± 0.0203 | 0.9421 ± 0.0037 | 0.9502 ± 0.0036 | 0.9204 ± 0.0188 |
-| SSA negatives ($\mathbf z$) | 0.9415 ± 0.0125 | 0.9504 ± 0.0109 | 0.9351 ± 0.0129 | 0.9474 ± 0.0121 |
+**Figure 5.** PCA rank and simulated measurement noise. (a) F1 as a function of retained PCA rank under clean conditions and at magnitude and phase jitter of $0.15\,\mathrm{dB}$ and $0.75^\circ$. The horizontal lines show the corresponding SSA-ratio Transformer scores. (b) F1 across seven paired jitter levels. The shaded band is one SD across ten Transformer seeds. The PCA reference ranks were selected retrospectively.
 
-**$\mathrm{AP}_{0.05}$**
-
-| Representation | $k$-NN | Ledoit–Wolf |
-| --- | --- | --- |
-| Reconstruction ($\mathbf h$) | 0.6129 ± 0.0053 | 0.6662 ± 0.0324 |
-| Heuristic negatives ($\mathbf z$) | 0.5271 ± 0.0530 | 0.6902 ± 0.0470 |
-| SSA negatives ($\mathbf h$) | 0.8898 ± 0.0182 | 0.8620 ± 0.0064 |
-| SSA negatives ($\mathbf z$) | 0.9126 ± 0.0304 | 0.9188 ± 0.0237 |
-
-Values are mean $\pm$ SD over ten seeds. $\mathbf h$ denotes the encoder representation, and $\mathbf z$ denotes the normalized projection.
-
-PCA applied directly to the standardized spectra is sensitive to rank [Fig. 7(a)]. The healthy-data rules that retain at least $95\%$, $99\%$, and $99.5\%$ of variance select ranks 3, 4, and 5, with F1 scores of $0.7229$, $0.7493$, and $0.7347$. A retrospective rank sweep using labeled test performance reaches $0.9584$ at rank 8 under clean conditions. All three healthy-data variance rules select lower ranks.
-
-![Figure 7. PCA rank and simulated measurement noise.](figures/fig07_pca_cliff_and_7level_fra_noise.png)
-
-**Figure 7.** PCA rank and simulated measurement noise. (a) F1 as a function of retained PCA rank under clean conditions and at magnitude and phase jitter of $0.15\,\mathrm{dB}$ and $0.75^\circ$. The horizontal lines show the corresponding SSA-ratio Transformer scores. (b) F1 across seven paired jitter levels. The shaded band is one SD across ten Transformer seeds. The PCA reference ranks were selected retrospectively.
-
-**Table 6. Detection F1 at the healthy validation 97.5th percentile across seven simulated jitter levels.**
-
-| dB | Degrees | SSA Transformer | PCA 8 | PCA 10 | PCA 8 (refit) | Ledoit–Wolf | Raw $k$-NN |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 0.00 | 0.00 | 0.9417 ± 0.0128 | 0.9584 | 0.9347 | 0.9584 | 0.8992 | 0.7112 |
-| 0.05 | 0.25 | 0.9414 ± 0.0117 | 0.9417 | 0.8682 | 0.9443 | 0.8783 | 0.7112 |
-| 0.10 | 0.50 | 0.9313 ± 0.0108 | 0.8923 | 0.7331 | 0.8951 | 0.8122 | 0.7112 |
-| 0.15 | 0.75 | 0.9160 ± 0.0138 | 0.7967 | 0.6478 | 0.8177 | 0.7240 | 0.7112 |
-| 0.25 | 1.25 | 0.9025 ± 0.0199 | 0.6869 | 0.5492 | 0.7337 | 0.6749 | 0.7091 |
-| 0.40 | 2.00 | 0.8304 ± 0.0375 | 0.5245 | 0.4328 | 0.6852 | 0.5646 | 0.7073 |
-| 0.60 | 3.00 | 0.7695 ± 0.0240 | 0.4509 | 0.3615 | 0.6770 | 0.4509 | 0.6991 |
-
-Jitter levels are standard deviations. The Transformer column gives mean $\pm$ SD over ten seeds. PCA ranks were selected retrospectively. Only the refit comparator is fitted on noisy training spectra.
-
-At $0.15\,\mathrm{dB}$ and $0.75^\circ$, the clean-trained SSA-ratio Transformer attains $\mathrm{F1}_{0.975}=0.9284\pm0.0154$ in the rank-sweep comparison and $0.9160\pm0.0138$ in the seven-level sweep with separate noise draws [Fig. 7(b) and Table 6]. In the latter sweep, rank-8 PCA scores $0.7967$ with a clean fit and $0.8177$ when refitted on noisy healthy spectra. At $0.25\,\mathrm{dB}$ and $1.25^\circ$, the respective F1 scores are $0.9025$ for the Transformer and $0.7337$ for refitted PCA. At the highest tested jitter ($0.60\,\mathrm{dB}$ and $3.00^\circ$), Transformer F1 declines to $0.7695$. These results quantify sensitivity to the simulated noise model.
+At $0.15\,\mathrm{dB}$ and $0.75^\circ$, the clean-trained SSA-ratio Transformer attains $\mathrm{F1}_{0.975}=0.9284\pm0.0154$ in the rank-sweep comparison and $0.9160\pm0.0138$ in the seven-level sweep with separate noise draws (Fig. 5(b) and [Supplementary Table S5](tables/table06_fra_noise_robustness_sweep.md)). In the latter sweep, rank-8 PCA scores $0.7967$ with a clean fit and $0.8177$ when refitted on noisy healthy spectra. At $0.25\,\mathrm{dB}$ and $1.25^\circ$, the respective F1 scores are $0.9025$ for the Transformer and $0.7337$ for refitted PCA. At the highest tested jitter ($0.60\,\mathrm{dB}$ and $3.00^\circ$), Transformer F1 declines to $0.7695$. These results quantify sensitivity to the simulated noise model.
 
 ### 6.5. Training-Set Size and Held-Out Fault Modes
 
-Fig. 8(a) compares training sets of 50 to 300 healthy sweeps on the same benchmark. With 100 sweeps, the mean Transformer F1 is $0.9006\pm0.0481$ and mean adjusted AP is $0.8440\pm0.0459$ over five subsampling runs. At 200 sweeps the scores are $0.9358\pm0.0074$ and $0.9073\pm0.0135$, respectively. These are within-benchmark sample-size estimates.
+Fig. 6(a) compares training sets of 50 to 300 healthy sweeps on the same benchmark. With 100 sweeps, the mean Transformer F1 is $0.9006\pm0.0481$ and mean adjusted AP is $0.8440\pm0.0459$ over five subsampling runs. At 200 sweeps the scores are $0.9358\pm0.0074$ and $0.9073\pm0.0135$, respectively. These are within-benchmark sample-size estimates.
 
-![Figure 8. Training-set size and held-out fault modes.](figures/fig08_learning_curves_and_lofo_generalization.png)
+![Figure 6. Training-set size and held-out fault modes.](figures/fig08_learning_curves_and_lofo_generalization.png)
 
-**Figure 8.** Training-set size and held-out fault modes. (a) Prevalence-adjusted AP as a function of the number of healthy training sweeps. Bands indicate one SD across five runs where available. (b) Median thresholded recall with all fault modes included in augmentation and with the indicated mode omitted. Dots show individual held-out-mode runs, and annotations give median held-out ROC AUC.
+**Figure 6.** Training-set size and held-out fault modes. (a) Prevalence-adjusted AP as a function of the number of healthy training sweeps. Bands indicate one SD across five runs where available. (b) Median thresholded recall with all fault modes included in augmentation and with the indicated mode omitted. Dots show individual held-out-mode runs, and annotations give median held-out ROC AUC.
 
-In each leave-one-fault-out experiment, the target mode is removed from the single-mode training sampler. The detector is then evaluated on isolated simulated faults of that mode. Table 7 and Fig. 8(b) summarize five runs per mode. Mean recall remains above $93\%$ for withheld capacitance and inductance faults, with mean ROC AUC of $0.9989$ and $0.9911$, respectively. Withholding capacitor or inductor ESR gives median recall above $90\%$, but mean recall is lower ($82.9\%$ and $75.2\%$), with substantial variability over seeds. High-side switch recall is $30.5\%$ when omitted and $38.9\%$ when included in augmentation. The transfer results are specific to held-out parameter changes in the same simulated topology.
-
-**Table 7. Leave-one-fault-out evaluation of the SSA-ratio Transformer over five seeds.**
-
-| Omitted mode | $n$ | Held-out ROC AUC | Held-out recall (\%) | Included recall (\%) | Overall $\mathrm{F1}_{0.975}$ |
-| --- | --- | --- | --- | --- | --- |
-| $C_{\mathrm{out}}$ | 23 | 0.9989 ± 0.0008 [0.9991, 0.0009] | 99.1 ± 1.9 [100.0, 0.0] | 100.0 ± 0.0 | 0.9482 ± 0.0094 |
-| $L_{\mathrm{out}}$ | 22 | 0.9911 ± 0.0027 [0.9905, 0.0014] | 93.6 ± 2.5 [95.5, 4.5] | 91.8 ± 2.0 | 0.9473 ± 0.0071 |
-| $\mathrm{ESR}_C$ | 28 | 0.9715 ± 0.0525 [0.9939, 0.0079] | 82.9 ± 24.7 [92.9, 3.6] | 90.0 ± 9.2 | 0.9106 ± 0.0687 |
-| $\mathrm{ESR}_L$ | 21 | 0.9470 ± 0.0717 [0.9705, 0.0214] | 75.2 ± 31.5 [90.5, 4.8] | 94.3 ± 2.1 | 0.9087 ± 0.0749 |
-| $R_{\mathrm{ds},1}$ | 19 | 0.7466 ± 0.0563 [0.7684, 0.0442] | 30.5 ± 13.6 [31.6, 10.5] | 38.9 ± 8.0 | 0.9177 ± 0.0524 |
-
-Values are mean $\pm$ SD, with [median, interquartile range] where indicated. Recall is measured at the healthy validation 97.5th percentile. Included recall is the reference obtained with all five modes in augmentation.
-
-### 6.6. Frequency Dependence of Attention and Score Sensitivity
-
-We compare mean attention assigned to each key frequency and the norm of the anomaly-score gradient with respect to the two standardized channels at that frequency. For the reconstruction-only control the score is nearest-neighbor distance in the encoder representation. The contrastive models use their normalized projections. The gradient norms are averaged over sweeps and normalized by the total across frequencies for each run. Attention weights are reported as a complementary description of the model [@jain2019attention].
-
-![Figure 9. Attention and score sensitivity on the variable-load benchmark.](figures/fig09_attention_and_jacobian_saliency.png)
-
-**Figure 9.** Attention and score sensitivity on the variable-load benchmark. (a) Mean attention weight per key frequency. The uniform reference is $100/101\%$ per bin, and $H$ is normalized Shannon entropy. (b) Norm of the score gradient per frequency, shown relative to uniform sensitivity. The shaded regions mark the $0.7$–$2.0\,\mathrm{kHz}$ resonance band.
-
-The reconstruction-only and heuristic-negative Transformers concentrate mean attention near $1.01\,\mathrm{kHz}$, with normalized entropies of $0.8298\pm0.0421$ and $0.8281\pm0.0423$, respectively. Mean attention is nearly uniform for the SSA-ratio Transformer ($0.9996\pm0.0002$) [Fig. 9(a)]. In the resonance band, the corresponding normalized gradient sensitivities are $2.92$ and $2.67$ for the two controls, compared with $0.833\pm0.086$ for the SSA-ratio model on healthy sweeps [Fig. 9(b)]. The SSA-ratio model shows relatively higher low-frequency sensitivity for inductor ESR and high-side switch faults, consistent with the gain changes in Section 3.2. These observations characterize local model sensitivity. Establishing invariance to load would require perturbations along measured or simulated load trajectories.
+In each leave-one-fault-out experiment, the target mode is removed from the single-mode training sampler. The detector is then evaluated on isolated simulated faults of that mode. Fig. 6(b) and [Supplementary Table S6](tables/table07_lofo_generalization.md) summarize five runs per mode. Mean recall remains above $93\%$ for withheld capacitance and inductance faults, with mean ROC AUC of $0.9989$ and $0.9911$, respectively. Withholding capacitor or inductor ESR gives median recall above $90\%$, but mean recall is lower ($82.9\%$ and $75.2\%$), with substantial variability over seeds. High-side switch recall is $30.5\%$ when omitted and $38.9\%$ when included in augmentation. The transfer results are specific to held-out parameter changes in the same simulated topology.
 
 ## 7. Discussion
 
@@ -407,13 +278,15 @@ The reported uncertainty captures variation over training seeds on one split. Pe
 
 All evaluated spectra are simulated open-loop plant responses. The injected magnitude and phase jitter probes one source of acquisition uncertainty. In regulated hardware, plant identification depends on the excitation and feedback paths, particularly at low frequencies, and can be affected by timing delays, quantization, interference, and temperature-dependent parasitics [@roinila2021frequency]. The findings also leave open the effects of nonlinear or discontinuous-conduction operating regimes. A hardware study would be needed to establish acquisition repeatability, diagnostic performance, and embedded latency under those conditions.
 
+The SSA-ratio Transformer shows a weaker anomaly-score gradient in the resonance band than the reconstruction-only and heuristic controls on healthy sweeps ([Supplementary Fig. S1](figures/fig09_attention_and_jacobian_saliency.png)). Attention and gradients describe model behavior on the evaluated spectra [@jain2019attention]. Establishing invariance to load would require perturbations along measured or simulated load trajectories.
+
 ## 8. Conclusion
 
 An autoencoder with physics-informed contrastive augmentation improved detection of isolated capacitor and inductor ESR increases in simulated buck converter responses under variable load. The augmentation uses nominal-load transfer-function ratios and requires no load measurement for an individual sweep. Mean F1 on the variable-load test split was $0.9417$ with healthy-only threshold calibration and $0.9160$ at $0.15\,\mathrm{dB}$ and $0.75^\circ$ in the simulated noise sweep. Isolated high-side switch degradation remained difficult to detect. The practical value of these results depends on whether they transfer to hardware-acquired spectra under normal operating variation.
 
 ## Data and Code Availability
 
-The experiment code and summary results are archived in the [code repository](https://github.com/igmsalinas/fault-converters-code/tree/9e13ccdd263346e2eadd15102fe096393a64d38a). The variable-load sweeps, manifest, split, and saved run artifacts are archived in the [data repository](https://github.com/igmsalinas/fault-converters-data/tree/4950ecf604fab8b63395201b2d4a28af88fae8e8). Access requires repository permissions. Large artifacts use Git LFS. The fixed-load results are available as saved outputs, and the raw fixed-load cohort remains to be archived.
+The experiment code and summary results are archived in the [code repository](https://github.com/igmsalinas/fault-converters-code/tree/9e13ccdd263346e2eadd15102fe096393a64d38a). The variable-load sweeps, manifest, split, and saved run artifacts are archived in the [data repository](https://github.com/igmsalinas/fault-converters-data/tree/4950ecf604fab8b63395201b2d4a28af88fae8e8). Access requires repository permissions. Large artifacts use Git LFS. The fixed-load results are available as saved outputs, and the raw fixed-load cohort remains to be archived. The [supplementary material](supplement.tex) reports the full benchmark and sensitivity results.
 
 ## Acknowledgment
 

@@ -1,0 +1,24 @@
+\begin{table}[!t]
+\centering
+\caption{Detection performance under variable load.}
+\label{tab:variable_load_benchmark}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrr@{}}
+\toprule
+Detector & $\Fmain$ & $\AP$ \\
+\midrule
+One-class SVM & 0.6892 & 0.5434 \\
+Raw $k$-NN ($k=5$) & 0.7112 & 0.6268 \\
+Mahalanobis (ridge) & 0.7638 & 0.7086 \\
+Isolation forest & 0.8347 & 0.7289 \\
+Mahalanobis (Ledoit--Wolf) & 0.8992 & 0.7874 \\
+PCA (99\% variance, rank 4) & 0.7493 & 0.6602 \\
+Transformer, SSA negatives & $0.9417 \pm 0.0128$ & $0.9126 \pm 0.0308$ \\
+\midrule
+PCA (retrospective rank 10) & 0.9347 & 0.8538 \\
+Supervised gradient boosting & 0.9340 & 0.9322 \\
+\bottomrule
+\end{tabular*}
+\par\smallskip\parbox{\columnwidth}{Transformer results are mean $\pm$ SD over ten seeds. The last two rows use fault labels.}
+\end{table}
