@@ -1,0 +1,55 @@
+README.md
+  s_066a1cbbd1b060::t_f4e95bf977ba38 5,8-9,11
+REVIEW.md
+  s_066a1cbbd1b060::t_1a906f37e20774 3,12,21-25
+main.tex
+  s_066a1cbbd1b060::t_1437abdc357f71 10-12,44,61-67,83,119-125,204,211,213,215-217,220,222,224,226,228,230,232,234,236,238,245,247,249,251,253,255,265-266,273
+manuscript.md
+  s_066a1cbbd1b060::t_28b93d7229fb47 61-72,85,217,219,221,223-233,235,239,243,245,249,253,255,257,259,261,265,267,269,271,281-282,289
+supplement.tex
+  s_066a1cbbd1b060::t_00584f25899097 1-51
+tables/table01_converter_parameters.tex
+  s_066a1cbbd1b060::t_b7e72d4aa982ba 1,3,6-7,9,11-16,19-20
+tables/table02_variable_load_benchmark.md
+  s_066a1cbbd1b060::t_46c731147e0745 1
+tables/table02_variable_load_benchmark.tex
+  s_066a1cbbd1b060::t_aeea8313c29361 1
+tables/table02_variable_load_summary.tex
+  s_066a1cbbd1b060::t_7dd171e8eca75c 1-24
+tables/table03_10seed_contrastive_ablation.md
+  s_066a1cbbd1b060::t_b68635fc46fd1f 1
+tables/table03_10seed_contrastive_ablation.tex
+  s_066a1cbbd1b060::t_979338bce3db61 1
+tables/table04_encoder_backbone_comparison.md
+  s_066a1cbbd1b060::t_8d3195c312e8c4 1
+tables/table04_encoder_backbone_comparison.tex
+  s_066a1cbbd1b060::t_813f5a130c4c38 1
+tables/table05_representation_vs_scorer_matrix.md
+  s_066a1cbbd1b060::t_b03e76652494d8 1
+tables/table05_representation_vs_scorer_matrix.tex
+  s_066a1cbbd1b060::t_2ca43c77aa3d7a 1
+tables/table06_fra_noise_robustness_sweep.md
+  s_066a1cbbd1b060::t_4f4720fd324d3b 1
+tables/table06_fra_noise_robustness_sweep.tex
+  s_066a1cbbd1b060::t_3d8b2a896cc80f 1
+tables/table07_lofo_generalization.md
+  s_066a1cbbd1b060::t_57a842e3606ff8 1
+tables/table07_lofo_generalization.tex
+  s_066a1cbbd1b060::t_c3bf4ceba8ba6e 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "04d6e5f777846b6f2e23e7bbbd5429ec92c3eb61",
+  "prompts": {},
+  "sessions": {
+    "s_066a1cbbd1b060": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1ede1-6a93-7d00-b934-9f7cce57ac7d",
+        "model": "gpt-6.2-sol"
+      },
+      "human_author": "Ignacio Martin Salinas <ignacioms@inditex.com>"
+    }
+  }
+}
