@@ -2,7 +2,7 @@
 
 - [Code snapshot](https://github.com/igmsalinas/fault-converters-code/tree/9e13ccdd263346e2eadd15102fe096393a64d38a) contains the experiment code and derived publication results.
 - [Data snapshot](https://github.com/igmsalinas/fault-converters-data/tree/4950ecf604fab8b63395201b2d4a28af88fae8e8) contains the variable-load sweeps, manifests, split and stored experiments. Large files use Git LFS.
-- Access to both repositories requires GitHub permissions. The exact raw cohort used for the fixed-load papers remains to be archived. Their saved evaluation records are available in the corrected campaign.
+- Access to both repositories requires GitHub permissions. The exact raw cohort used for the manuscript’s fixed-load comparison remains to be archived. The saved evaluation records for that comparison are available in the corrected campaign.
 
 ## Release wording
 
