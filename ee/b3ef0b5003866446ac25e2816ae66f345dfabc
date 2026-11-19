@@ -1,0 +1,33 @@
+REVIEW.md
+  s_06fa418c901934::t_9e6c4003625404 11
+main.tex
+  s_06fa418c901934::t_60ab4aaba09a9d 26,35,37,39,41,46,52,54,56,63,69,73,82,86,104,106,108,112,114,121,134,138,146,150,152,156,162,164,170,176,178,182,184,188,195,197,199,206,213,219,221,223,229,231,235,237,241,243,245,249,260
+manuscript.md
+  s_06fa418c901934::t_566f52f62c9426 31,35,37,39,41,45,49,51,53,59,74,85,89,111,113,115,119,123,125,140,144,154,158,160,164,168,176,178,183,189,191,195,197,201,207,209,211,217,219,221,225,236,240,244,246,250,254,256,260,262,264,268
+tables/table02_variable_load_summary.tex
+  s_8481a24610facb::t_78092d9c984a5d 9,22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "eeb3ef0b5003866446ac25e2816ae66f345dfabc",
+  "prompts": {},
+  "sessions": {
+    "s_06fa418c901934": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1ee90-2d58-7f60-9121-1fc6ce51e3fe",
+        "model": "gpt-6.2-sol"
+      },
+      "human_author": "Ignacio Martin Salinas <ignacioms@inditex.com>"
+    },
+    "s_8481a24610facb": {
+      "agent_id": {
+        "tool": "github-copilot-cli",
+        "id": "22212c31-784b-42cc-b71f-e759f8261979",
+        "model": "unknown"
+      },
+      "human_author": "Ignacio Martin Salinas <ignacioms@inditex.com>"
+    }
+  }
+}
