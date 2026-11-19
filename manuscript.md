@@ -273,7 +273,7 @@ An autoencoder with physics-informed contrastive augmentation improved detection
 - **Variable-load sweeps, manifest, split, and saved runs.** [github.com/igmsalinas/fault-converters-data](https://github.com/igmsalinas/fault-converters-data) (revision [4950ecf](https://github.com/igmsalinas/fault-converters-data/tree/4950ecf604fab8b63395201b2d4a28af88fae8e8)).
 - **LaTeX manuscript, figures, and tables.** [github.com/igmsalinas/variable-load-fra-paper](https://github.com/igmsalinas/variable-load-fra-paper).
 
-Repository access requires GitHub permissions. Large data artifacts use Git LFS. The fixed-load evaluation records are archived with the data. The exact raw fixed-load cohort remains to be archived.
+The repositories are publicly accessible on GitHub. Large data artifacts use Git LFS. The fixed-load evaluation records are archived with the data. The exact raw fixed-load cohort remains to be archived.
 
 ## Acknowledgment
 
