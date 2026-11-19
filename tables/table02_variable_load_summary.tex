@@ -6,7 +6,7 @@
 \setlength{\tabcolsep}{3pt}
 \begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrr@{}}
 \toprule
-Detector & $\Fmain$ & $\AP$ \\
+Detector & F1 & $\AP$ \\
 \midrule
 One-class SVM & 0.6892 & 0.5434 \\
 Raw $k$-NN ($k=5$) & 0.7112 & 0.6268 \\
@@ -19,5 +19,5 @@ Transformer, SSA negatives & $0.9417 \pm 0.0128$ & $0.9126 \pm 0.0308$ \\
 Supervised gradient boosting & 0.9340 & 0.9322 \\
 \bottomrule
 \end{tabular*}
-\par\smallskip\parbox{\columnwidth}{Transformer results are mean $\pm$ SD over ten seeds. Only the supervised reference uses fault labels for training. Its F1 uses a threshold of 0.5.}
+\par\smallskip\parbox{\columnwidth}{Transformer results are mean $\pm$ SD over ten seeds. The one-class detectors use the 97.5th percentile of healthy validation scores. The supervised detector uses a fault-probability threshold of 0.5.}
 \end{table}
