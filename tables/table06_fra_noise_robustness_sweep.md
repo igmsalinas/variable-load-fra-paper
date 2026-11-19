@@ -1,4 +1,4 @@
-**Supplementary Table S5. Detection F1 at the healthy validation 97.5th percentile across seven simulated jitter levels.**
+**Detection F1 at the healthy validation 97.5th percentile across seven simulated jitter levels.**
 
 | dB | Degrees | SSA Transformer | PCA 8 | PCA 10 | PCA 8 (refit) | Ledoit–Wolf | Raw $k$-NN |
 | --- | --- | --- | --- | --- | --- | --- | --- |

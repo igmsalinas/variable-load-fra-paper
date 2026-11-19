@@ -16,9 +16,8 @@ Mahalanobis (Ledoit--Wolf) & 0.8992 & 0.7874 \\
 PCA (99\% variance, rank 4) & 0.7493 & 0.6602 \\
 Transformer, SSA negatives & $0.9417 \pm 0.0128$ & $0.9126 \pm 0.0308$ \\
 \midrule
-PCA (retrospective rank 10) & 0.9347 & 0.8538 \\
 Supervised gradient boosting & 0.9340 & 0.9322 \\
 \bottomrule
 \end{tabular*}
-\par\smallskip\parbox{\columnwidth}{Transformer results are mean $\pm$ SD over ten seeds. The last two rows use fault labels.}
+\par\smallskip\parbox{\columnwidth}{Transformer results are mean $\pm$ SD over ten seeds. Only the supervised reference uses fault labels for training. Its F1 uses a threshold of 0.5.}
 \end{table}

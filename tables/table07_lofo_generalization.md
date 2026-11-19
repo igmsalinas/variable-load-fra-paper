@@ -1,4 +1,4 @@
-**Supplementary Table S6. Leave-one-fault-out evaluation of the SSA-ratio Transformer over five seeds.**
+**Leave-one-fault-out evaluation of the SSA-ratio Transformer over five seeds.**
 
 | Omitted mode | $n$ | Held-out ROC AUC | Held-out recall (\%) | Included recall (\%) | Overall $\mathrm{F1}_{0.975}$ |
 | --- | --- | --- | --- | --- | --- |

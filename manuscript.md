@@ -38,7 +38,7 @@ Load variation complicates interpretation of these responses. Increasing the loa
 
 We propose a physics-informed contrastive autoencoder, CARLA-Transformer (SSA), for detecting component degradation from the complex control-to-output response. The training procedure multiplies each healthy spectrum by a fault-to-healthy ratio derived from a state-space averaged (SSA) model at nominal load. This provides synthetic negatives while retaining the healthy spectrum as the starting point. The self-attention encoder can combine information across frequencies, and a nearest-neighbor score is calibrated on healthy validation sweeps. Fig. 1 summarizes the method.
 
-The study makes three contributions. First, it derives a conduction-loss model and quantifies its agreement with switched simulation at the simulated component values and loads. Second, it evaluates nominal-load ratio augmentation against reconstruction-only and heuristic-augmentation controls on a shared variable-load split. Third, it examines the effects of encoder and scorer choice, simulated measurement noise, omission of fault families from training, and frequency-dependent score sensitivity.
+The study makes three contributions. First, it derives a conduction-loss model and quantifies its agreement with switched simulation at the simulated component values and loads. Second, it evaluates nominal-load ratio augmentation against reconstruction-only and heuristic-augmentation controls on a shared variable-load split. Third, it measures how simulated measurement jitter affects detection and compares that behavior with PCA.
 
 ![Figure 1. Frequency-response monitoring under variable load.](figures/fig01_system_and_carla_framework.png)
 
@@ -180,7 +180,7 @@ $$
 a(\mathbf X)=\frac{1}{5}\sum_{\mathbf v\in\mathcal N_5(\mathbf z)}
 \|\mathbf z-\mathbf v\|_2.
 $$
-A query is flagged if its score exceeds the empirical 97.5th percentile of the scores on the healthy validation split. The 95th percentile is used for a secondary comparison. We denote the corresponding test F1 scores by $\mathrm{F1}_{0.975}$ and $\mathrm{F1}_{0.95}$. These percentiles target nominal validation exceedance rates of $2.5\%$ and $5\%$, respectively. Test false-alarm rates depend on the calibration sample and the operating distribution.
+A query is flagged if its score exceeds the empirical 97.5th percentile of the scores on the healthy validation split. We denote the corresponding test F1 by $\mathrm{F1}_{0.975}$. The threshold targets a nominal validation exceedance rate of $2.5\%$. Test false-alarm rates depend on the calibration sample and the operating distribution.
 
 ## 5. Experimental Design
 
@@ -194,7 +194,7 @@ The variable-load benchmark contains 500 healthy and 300 faulty sweeps, includin
 
 Classical baselines operate on 202 standardized Cartesian features. They include Euclidean $k$-nearest neighbors ($k=1,5$), a radial-basis one-class SVM ($\nu=0.05$), an isolation forest (200 trees), Mahalanobis distance with ridge regularization ($10^{-6}$) or Ledoit–Wolf covariance shrinkage, and PCA reconstruction residuals. PCA ranks selected using performance on labeled test faults are reported as retrospective references. A histogram gradient-boosting classifier uses 400 healthy sweeps from training and fit-validation, plus the 90 labeled fit-validation faults. Its probability threshold is 0.5.
 
-The ten-seed Transformer ablation compares reconstruction-only training with either reconstruction-error or latent nearest-neighbor scoring, contrastive training with heuristic negatives, and contrastive training with SSA-ratio negatives. The heuristic sampler includes spectral spikes, dropouts, resonance shifts, and empirical component-specific perturbations applied to the standardized channels. The contrastive comparisons share the same architecture and nearest-neighbor scoring on the normalized projections. In the figures, AE and MSE denote the autoencoder and mean squared error, respectively. A separate five-seed study compares Transformer, one-dimensional convolution, long short-term memory (LSTM) [@hochreiter1997lstm], gated recurrent unit (GRU) [@cho2014gru], and multilayer perceptron (MLP) configurations selected in the fixed-load study. The configurations retain their backbone-specific layer widths, projection dimensions, and training hyperparameters. These comparisons use the same SSA augmentation and scoring procedure.
+The ten-seed Transformer ablation compares reconstruction-only training with either reconstruction-error or latent nearest-neighbor scoring, contrastive training with heuristic negatives, and contrastive training with SSA-ratio negatives. The heuristic sampler includes spectral spikes, dropouts, resonance shifts, and empirical component-specific perturbations applied to the standardized channels. The contrastive comparisons share the same architecture and nearest-neighbor scoring on the normalized projections. In the figures, AE and MSE denote the autoencoder and mean squared error, respectively.
 
 ### 5.3. Metrics, Simulated Noise, and Paired Comparisons
 
@@ -208,15 +208,17 @@ We report prevalence-adjusted average precision ($\mathrm{AP}_{0.05}$), which su
 
 For the noise study, we add zero-mean Gaussian jitter to the magnitude in decibels and phase in degrees before Cartesian conversion. Noise draws are independent across sweeps and frequency bins and use separate draws for training, validation and test spectra. The magnitude standard deviations are $0$, $0.05$, $0.10$, $0.15$, $0.25$, $0.40$, and $0.60\,\mathrm{dB}$, paired with phase standard deviations from $0^\circ$ to $3.00^\circ$ at $5^\circ$ per decibel. At each level, the threshold uses healthy validation spectra with the corresponding noise condition. The Transformer weights remain fixed. Its reference bank is rebuilt from healthy training sweeps perturbed at the corresponding level. The comparison detectors retain their clean-data fits except for PCA when explicitly refitted on noisy training spectra.
 
-Results across seeds are summarized by the mean and standard deviation (SD). These SDs describe variability over runs on the shared split. The Transformer ablations pair initial weights by seed. We use an exact two-sided paired sign-flip test on F1 differences, with a minimum attainable $p$-value of $2/2^{10}=0.001953$. The five-seed encoder comparison is descriptive, as the minimum attainable two-sided $p$-value is $0.0625$.
+Results across seeds are summarized by the mean and standard deviation (SD). These SDs describe variability over runs on the shared split. The Transformer ablations pair initial weights by seed. We use an exact two-sided paired sign-flip test on F1 differences, with a minimum attainable $p$-value of $2/2^{10}=0.001953$.
 
 ## 6. Results
 
-### 6.1. Fixed- and Variable-Load Benchmarks
+### 6.1. Detection Under Variable Load
 
-At fixed load, raw nearest-neighbor scoring ($k=1$) achieves $\mathrm{F1}_{0.975}=0.9244$ and $\mathrm{AP}_{0.05}=0.8031$. The convolutional encoder trained with SSA-ratio augmentation achieves $0.9399\pm0.0033$ and $0.8332\pm0.0058$, respectively. On the variable-load benchmark, raw nearest-neighbor F1 is $0.7134$ with $k=1$ and $0.7112$ with $k=5$. The benchmarks also differ in sample size and composition, so the cross-benchmark comparison does not isolate a causal effect of load on F1.
+At fixed load, raw nearest-neighbor scoring ($k=1$) achieves $\mathrm{F1}_{0.975}=0.9244$. The same scorer gives $0.7134$ on the variable-load benchmark. The cohorts differ in size and composition, so the score difference does not isolate the effect of load.
 
-Table 2 summarizes the aggregate variable-load results. Raw $k$-NN detects approximately $91\%$ of isolated capacitance and inductance faults but only $3.6\%$ of capacitor ESR faults and $4.8\%$ of inductor ESR faults ([Supplementary Table S1](tables/table02_variable_load_benchmark.md)). Ledoit–Wolf Mahalanobis scoring improves F1 to $0.8992$ but detects $71.4\%$ and $66.7\%$ of those two fault types, respectively. The Transformer trained with SSA-ratio augmentation achieves $\mathrm{F1}_{0.975}=0.9417\pm0.0128$, $\mathrm{AP}_{0.05}=0.9126\pm0.0308$, and ROC AUC of $0.9740\pm0.0064$. It flags 0 to 6 of the 100 healthy test sweeps across the ten seeds. Its precision and recall at the benchmark class balance are $0.9870\pm0.0102$ and $0.9005\pm0.0192$. The supervised reference has a similar F1 of $0.9340$ and higher average precision of $0.9322$. High-side switch recall remains modest at $36.3\%$ for the SSA-ratio model.
+Table 2 compares the detectors on the variable-load split. The SSA-ratio model achieves $\mathrm{F1}_{0.975}=0.9417\pm0.0128$, $\mathrm{AP}_{0.05}=0.9126\pm0.0308$, and ROC AUC of $0.9740\pm0.0064$. Across ten seeds it flags 0 to 6 of the 100 healthy test sweeps. The supervised reference achieves similar F1 ($0.9340$) and higher adjusted AP ($0.9322$).
+
+Raw 5-NN recalls $3.6\%$ of isolated capacitor ESR faults and $4.8\%$ of isolated inductor ESR faults. Ledoit–Wolf Mahalanobis scoring reaches $71.4\%$ and $66.7\%$, respectively. The corresponding recalls for SSA negatives are $(89.6\pm7.2)\%$ and $(92.4\pm4.0)\%$. The SSA-ratio model detects $100.0\%$ of isolated capacitance faults, $91.8\%$ of isolated inductance faults, and $97.4\%$ of compound faults on average. For isolated high-side switch degradation, mean recall is $(36.3\pm10.4)\%$.
 
 **Table 2. Detection performance under variable load.**
 
@@ -229,46 +231,29 @@ Table 2 summarizes the aggregate variable-load results. Raw $k$-NN detects appro
 | Mahalanobis (Ledoit–Wolf) | 0.8992 | 0.7874 |
 | PCA (99% variance, rank 4) | 0.7493 | 0.6602 |
 | Transformer, SSA negatives | $0.9417\pm0.0128$ | $0.9126\pm0.0308$ |
-| PCA (retrospective rank 10) | 0.9347 | 0.8538 |
 | Supervised gradient boosting | 0.9340 | 0.9322 |
 
-Transformer results are mean $\pm$ SD over ten seeds. The last two rows use fault labels.
+Transformer results are mean $\pm$ SD over ten seeds. Only the supervised reference uses fault labels for training. Its F1 uses a threshold of 0.5.
 
 ### 6.2. Effect of the Training Objective and Negative Samples
 
-Fig. 4 and [Supplementary Table S2](tables/table03_10seed_contrastive_ablation.md) compare Transformer training regimes across ten paired seeds. Reconstruction-error scoring gives a mean F1 of $0.7540$ and mean capacitor and inductor ESR recalls of $13.2\%$ and $9.5\%$. Applying $k$-NN to the reconstruction-only latent representation reduces F1 to $0.7090$. Contrastive training with heuristic negatives gives F1 of $0.6868$ and adjusted average precision of $0.5272$.
-
-The SSA-ratio model improves F1 by $0.188$ to $0.255$ over the three ablations and has higher F1 in every paired run ($p=0.00195$ for each comparison, unadjusted). Mean recall reaches $89.6\%$ for capacitor ESR and $92.4\%$ for inductor ESR. The contrastive comparison holds the architecture and scorer fixed and varies the negative examples. The comparison with reconstruction-error scoring also changes the scorer.
+Fig. 4 compares training regimes across ten paired seeds. Reconstruction scoring gives mean F1 of $0.7540$ and detects $13.2\%$ of isolated capacitor ESR faults and $9.5\%$ of isolated inductor ESR faults. Nearest-neighbor scoring on the reconstruction-only latent representation gives mean F1 of $0.7090$. Contrastive training with heuristic negatives gives mean F1 of $0.6868$.
 
 ![Figure 4. Ranking performance and training ablation on the variable-load benchmark.](figures/fig05_pr_curves_and_10seed_ablation.png)
 
-**Figure 4.** Ranking performance and training ablation on the variable-load benchmark. (a) Precision–recall curves adjusted to an assumed anomaly prevalence of $5\%$. AP is average precision. For a neural comparator, the curve is the run at the upper median of its ten AP values. The legend summarizes all seeds. (b) F1 at the healthy validation 97.5th percentile and prevalence-adjusted AP for the ten paired training runs. Bars show means, error bars show SDs, and dots give individual runs.
+**Figure 4.** Ranking performance and training ablation on the variable-load benchmark. (a) Precision–recall curves adjusted to an assumed anomaly prevalence of $5\%$. AP is average precision. For a neural comparator, the curve is the run at the upper median of its ten AP values. The legend summarizes all seeds. The PCA curve uses a retrospectively selected rank of 10. (b) F1 at the healthy validation 97.5th percentile and prevalence-adjusted AP for the ten paired training runs. Bars show means, error bars show SDs, and dots give individual runs.
 
-### 6.3. Encoder Comparison
+The SSA-ratio model improves mean F1 by $0.188$ to $0.255$ across the three comparisons and has higher F1 in all ten paired runs ($p=0.00195$ per comparison, unadjusted). The comparison with heuristic negatives holds the encoder and scorer fixed, isolating the effect of the negative sampler for this configuration. The reconstruction comparisons also change the training objective or scorer.
 
-With the same SSA-ratio augmentation, the Transformer has the highest mean F1 and AP among the five encoder configurations tested ([Supplementary Table S3](tables/table04_encoder_backbone_comparison.md)). Its clean mean F1 is $0.9447$, compared with $0.8611$ for the LSTM and $0.8426$ for the convolutional encoder. The LSTM detects capacitor ESR faults more often than inductor ESR faults ($84.3\%$ versus $24.8\%$), while the Transformer reaches $90.0\%$ and $94.3\%$, respectively. The GRU has the largest seed-to-seed variation (F1 SD $0.3207$). These comparisons apply to the evaluated configurations and do not identify which architectural property accounts for the differences.
+### 6.3. Sensitivity to Simulated Measurement Noise
 
-### 6.4. Scoring, PCA Rank, and Noise Sensitivity
-
-[Supplementary Table S4](tables/table05_representation_vs_scorer_matrix.md) compares four scorers on the encoder representation $\mathbf h$ or normalized projection $\mathbf z$. For the SSA-ratio model, mean F1 ranges from $0.9204$ to $0.9504$ across these combinations. The heuristic-negative representation gives mean F1 between $0.6674$ and $0.8042$. The reconstruction-only representation reaches $0.9373$ with rank-10 PCA scoring, despite scoring $0.7090$ with $k$-NN. The benefit of SSA-ratio augmentation is therefore most consistent across scorers, and a favorable scorer can also improve a reconstruction-only representation.
-
-PCA applied directly to the standardized spectra is sensitive to rank [Fig. 5(a)]. The healthy-data rules that retain at least $95\%$, $99\%$, and $99.5\%$ of variance select ranks 3, 4, and 5, with F1 scores of $0.7229$, $0.7493$, and $0.7347$. A retrospective rank sweep using labeled test performance reaches $0.9584$ at rank 8 under clean conditions. All three healthy-data variance rules select lower ranks.
+The PCA rank sweep [Fig. 5(a)] shows why the selection rule matters. Retaining $95\%$, $99\%$, or $99.5\%$ of healthy variance gives ranks 3, 4, and 5 and respective F1 scores of $0.7229$, $0.7493$, and $0.7347$. Selecting rank using labeled test performance reaches $0.9584$ at rank 8 under clean conditions. This retrospective score describes sensitivity to the rank choice.
 
 ![Figure 5. PCA rank and simulated measurement noise.](figures/fig07_pca_cliff_and_7level_fra_noise.png)
 
 **Figure 5.** PCA rank and simulated measurement noise. (a) F1 as a function of retained PCA rank under clean conditions and at magnitude and phase jitter of $0.15\,\mathrm{dB}$ and $0.75^\circ$. The horizontal lines show the corresponding SSA-ratio Transformer scores. (b) F1 across seven paired jitter levels. The shaded band is one SD across ten Transformer seeds. The PCA reference ranks were selected retrospectively.
 
-At $0.15\,\mathrm{dB}$ and $0.75^\circ$, the clean-trained SSA-ratio Transformer attains $\mathrm{F1}_{0.975}=0.9284\pm0.0154$ in the rank-sweep comparison and $0.9160\pm0.0138$ in the seven-level sweep with separate noise draws (Fig. 5(b) and [Supplementary Table S5](tables/table06_fra_noise_robustness_sweep.md)). In the latter sweep, rank-8 PCA scores $0.7967$ with a clean fit and $0.8177$ when refitted on noisy healthy spectra. At $0.25\,\mathrm{dB}$ and $1.25^\circ$, the respective F1 scores are $0.9025$ for the Transformer and $0.7337$ for refitted PCA. At the highest tested jitter ($0.60\,\mathrm{dB}$ and $3.00^\circ$), Transformer F1 declines to $0.7695$. These results quantify sensitivity to the simulated noise model.
-
-### 6.5. Training-Set Size and Held-Out Fault Modes
-
-Fig. 6(a) compares training sets of 50 to 300 healthy sweeps on the same benchmark. With 100 sweeps, the mean Transformer F1 is $0.9006\pm0.0481$ and mean adjusted AP is $0.8440\pm0.0459$ over five subsampling runs. At 200 sweeps the scores are $0.9358\pm0.0074$ and $0.9073\pm0.0135$, respectively. These are within-benchmark sample-size estimates.
-
-![Figure 6. Training-set size and held-out fault modes.](figures/fig08_learning_curves_and_lofo_generalization.png)
-
-**Figure 6.** Training-set size and held-out fault modes. (a) Prevalence-adjusted AP as a function of the number of healthy training sweeps. Bands indicate one SD across five runs where available. (b) Median thresholded recall with all fault modes included in augmentation and with the indicated mode omitted. Dots show individual held-out-mode runs, and annotations give median held-out ROC AUC.
-
-In each leave-one-fault-out experiment, the target mode is removed from the single-mode training sampler. The detector is then evaluated on isolated simulated faults of that mode. Fig. 6(b) and [Supplementary Table S6](tables/table07_lofo_generalization.md) summarize five runs per mode. Mean recall remains above $93\%$ for withheld capacitance and inductance faults, with mean ROC AUC of $0.9989$ and $0.9911$, respectively. Withholding capacitor or inductor ESR gives median recall above $90\%$, but mean recall is lower ($82.9\%$ and $75.2\%$), with substantial variability over seeds. High-side switch recall is $30.5\%$ when omitted and $38.9\%$ when included in augmentation. The transfer results are specific to held-out parameter changes in the same simulated topology.
+In the seven-level sweep [Fig. 5(b)], at $0.15\,\mathrm{dB}$ and $0.75^\circ$ jitter the clean-trained Transformer gives F1 of $0.9160\pm0.0138$. At this level rank-8 PCA gives $0.7967$ with a clean fit and $0.8177$ when refitted on noisy healthy spectra. The matched level in the rank sweep uses separate noise draws and yields Transformer F1 of $0.9284\pm0.0154$. At the highest tested jitter ($0.60\,\mathrm{dB}$ and $3.00^\circ$), Transformer mean F1 drops to $0.7695$. These comparisons characterize sensitivity under the specified jitter model.
 
 ## 7. Discussion
 
@@ -278,15 +263,13 @@ The reported uncertainty captures variation over training seeds on one split. Pe
 
 All evaluated spectra are simulated open-loop plant responses. The injected magnitude and phase jitter probes one source of acquisition uncertainty. In regulated hardware, plant identification depends on the excitation and feedback paths, particularly at low frequencies, and can be affected by timing delays, quantization, interference, and temperature-dependent parasitics [@roinila2021frequency]. The findings also leave open the effects of nonlinear or discontinuous-conduction operating regimes. A hardware study would be needed to establish acquisition repeatability, diagnostic performance, and embedded latency under those conditions.
 
-The SSA-ratio Transformer shows a weaker anomaly-score gradient in the resonance band than the reconstruction-only and heuristic controls on healthy sweeps ([Supplementary Fig. S1](figures/fig09_attention_and_jacobian_saliency.png)). Attention and gradients describe model behavior on the evaluated spectra [@jain2019attention]. Establishing invariance to load would require perturbations along measured or simulated load trajectories.
-
 ## 8. Conclusion
 
 An autoencoder with physics-informed contrastive augmentation improved detection of isolated capacitor and inductor ESR increases in simulated buck converter responses under variable load. The augmentation uses nominal-load transfer-function ratios and requires no load measurement for an individual sweep. Mean F1 on the variable-load test split was $0.9417$ with healthy-only threshold calibration and $0.9160$ at $0.15\,\mathrm{dB}$ and $0.75^\circ$ in the simulated noise sweep. Isolated high-side switch degradation remained difficult to detect. The practical value of these results depends on whether they transfer to hardware-acquired spectra under normal operating variation.
 
 ## Data and Code Availability
 
-The experiment code and summary results are archived in the [code repository](https://github.com/igmsalinas/fault-converters-code/tree/9e13ccdd263346e2eadd15102fe096393a64d38a). The variable-load sweeps, manifest, split, and saved run artifacts are archived in the [data repository](https://github.com/igmsalinas/fault-converters-data/tree/4950ecf604fab8b63395201b2d4a28af88fae8e8). Access requires repository permissions. Large artifacts use Git LFS. The fixed-load results are available as saved outputs, and the raw fixed-load cohort remains to be archived. The [supplementary material](supplement.tex) reports the full benchmark and sensitivity results.
+The experiment code and summary results are archived in the [code repository](https://github.com/igmsalinas/fault-converters-code/tree/9e13ccdd263346e2eadd15102fe096393a64d38a). The variable-load sweeps, manifest, split, and saved run artifacts are archived in the [data repository](https://github.com/igmsalinas/fault-converters-data/tree/4950ecf604fab8b63395201b2d4a28af88fae8e8). Access requires repository permissions. Large artifacts use Git LFS. The fixed-load results are available as saved outputs, and the raw fixed-load cohort remains to be archived.
 
 ## Acknowledgment
 

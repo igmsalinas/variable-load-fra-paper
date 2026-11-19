@@ -2,13 +2,12 @@
 
 IEEE journal manuscript on physics-informed anomaly detection from simulated buck converter frequency responses.
 
-- [main.tex](main.tex) is the IEEE manuscript source, with six figures and two summary tables.
+- [main.tex](main.tex) is the IEEE manuscript source, with five figures and two tables.
 - `manuscript.md` is the Markdown edition.
 - `references.bib` contains the bibliography.
-- [supplement.tex](supplement.tex) contains the six detailed tables and the attention and score-sensitivity figure.
 - The [figure source assets](figures) and [full tabular records](tables) also include assets used in earlier drafts.
 
-Build the manuscript and supplement separately with the IEEEtran document class. The manuscript uses BibTeX. In Overleaf, select the corresponding primary document to build each PDF.
+Build the manuscript with the IEEEtran document class and BibTeX. The LaTeX source is also ready to build in Overleaf.
 
 ## Review and reproducibility
 

@@ -18,15 +18,14 @@ The audit used the [experiment code at 9e13ccd](https://github.com/igmsalinas/fa
 | --- | --- |
 | IEEE Figs. 1 and 3 | The vector diagrams describe spectral augmentation, scoring and the shared encoder with reconstruction and projection branches. If model selection changes, regenerate from the editable diagram source and check widths, projection dimensions, and the distinction between training and scoring. |
 | IEEE Fig. 2 and Table I | The visible fault examples were matched to held-out sweeps and their measured severities. Regenerate from the raw sweeps and parameter manifest if examples, intervals or the converter model change. Rebuild the fixed-load panel after recovering the exact Dataset 01 cohort. |
-| IEEE Fig. 4, Table II, and Supplementary Tables S1–S2 | Regenerate from the final calibrated runs and the corresponding test labels and scores. Keep the assumed 5% prevalence in the adjusted PR curve and distinguish the representative curve from the across-seed legend. |
-| Supplementary Tables S3–S4 | The encoder and scorer comparisons retain the full metrics in tables. Encoder configurations include architecture-specific tuning. Compare matched budgets for an architecture-only claim. |
-| IEEE Figs. 5–6, Supplementary Tables S5–S6, and Supplementary Fig. S1 | Use the archived noise, training-size, excluded-fault and frequency-profile records. The noisy Transformer uses clean weights and recalculates its reference embeddings and threshold on perturbed inputs. The rank and noise sweeps use different noise draws. Interpret gradient profiles as local score sensitivity. |
+| IEEE Fig. 4 and Table II | Regenerate from the final calibrated runs and the corresponding test labels and scores. Keep the assumed 5% prevalence in the adjusted PR curve and distinguish the representative curve from the across-seed legend. The PCA curve uses the retrospectively selected rank 10. |
+| IEEE Fig. 5 | Use the archived PCA-rank and noise-sweep records. The noisy Transformer uses clean weights and recalculates its reference embeddings and threshold on perturbed inputs. The rank and noise sweeps use different noise draws. |
 
-The fixed-versus-variable detection graphic and the encoder/scorer graphic were removed from the article. The benchmark summaries, fault-level recall, encoder results and scorer matrix are retained in the article and supplement.
+The manuscript presents the benchmark, paired ablation, fault-level recall, and noise sensitivity in one document. The detailed numerical records, encoder and scorer comparisons, learning curves, held-out-mode tests, and attention analysis remain in the experimental archive.
 
 ## Before journal submission
 
-1. Record the original evaluation environment and replay the secondary variable-load analyses with the frozen split, preprocessor and weights. Exact training reproducibility requires the corresponding historical source revisions and simulator configuration.
+1. Record the original evaluation environment and replay the reported variable-load analyses with the frozen split, preprocessor and weights. Exact training reproducibility requires the corresponding historical source revisions and simulator configuration.
 2. Recover the exact raw fixed-load Dataset 01 cohort, simulator inputs and sweep identities to replay the fixed-load comparisons. The legacy ZIP documents a separate 161,051-sweep grid.
 3. Measure the nominal-load augmentation error on paired healthy and faulty samples at controlled loads. The current results apply to one simulated split. Independent splits, hardware frequency-response measurements and changed operating conditions require separate validation.
 4. Verify access and selective Git LFS retrieval from clean checkouts of the cited artifact releases. Update the [availability statement](DATA_CODE_AVAILABILITY.md) and verify the author metadata and reference style against the target journal's requirements.
