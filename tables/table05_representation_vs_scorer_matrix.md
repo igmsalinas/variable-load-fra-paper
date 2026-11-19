@@ -1,4 +1,4 @@
-**Table 5. Effects of representation and anomaly scoring on the variable-load benchmark.**
+**Effects of representation and anomaly scoring on the variable-load benchmark.**
 
 **$\mathrm{F1}_{0.975}$**
 

@@ -1,4 +1,4 @@
-**Table 3. Paired Transformer ablation on the variable-load benchmark over ten seeds.**
+**Paired Transformer ablation on the variable-load benchmark over ten seeds.**
 
 | Training and scoring | $\mathrm{F1}_{0.975}$ | $\mathrm{AP}_{0.05}$ | ROC AUC |
 | --- | --- | --- | --- |

@@ -1,4 +1,4 @@
-**Table 4. Encoder comparisons with the same SSA-ratio augmentation on the variable-load benchmark.**
+**Encoder comparisons with the same SSA-ratio augmentation on the variable-load benchmark.**
 
 | Encoder | Clean $\mathrm{F1}_{0.975}$ | Noisy $\mathrm{F1}_{0.975}$ | $\mathrm{AP}_{0.05}$ | ROC AUC |
 | --- | --- | --- | --- | --- |
