@@ -12,7 +12,9 @@ Build `main.tex` with the IEEEtran document class and BibTeX bibliography style.
 
 ## Review and reproducibility
 
-- [Manuscript review and figure verification](REVIEW.md)
-- [GitHub and Git LFS availability template](DATA_CODE_AVAILABILITY.md)
+- [Cross-repository reproducibility review](REVIEW.md) records the verified results, manuscript corrections, and remaining gaps.
+- [Experiment code](https://github.com/igmsalinas/fault-converters-code) hosts the training and evaluation code, derived results, and the fixed-load and Jetson companion papers.
+- [Data and archived runs](https://github.com/igmsalinas/fault-converters-data) hosts the variable-load sweeps, split, checkpoints, and fixed-load evaluation records.
+- [Data and code availability](DATA_CODE_AVAILABILITY.md) pins the audited snapshots and records the release requirements.
 
 Figures 1 and 3 are vector schematics. Run `python3 figures/source/draw_method_figures.py` with Matplotlib and NumPy to regenerate their PDF and PNG versions.

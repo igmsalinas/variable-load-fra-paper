@@ -131,7 +131,7 @@ def draw_overview():
     node(ax, 315, 191.5)
     views = [
         (233, "Identity", r"$H_i$", "Anchor"),
-        (191.5, "Small perturbation", r"$H_i^+$", "Positive view"),
+        (191.5, "Jitter and scaling", r"$H_i^+$", "Positive view"),
         (148, r"Multiply by $\Gamma_{\boldsymbol{\alpha}}$",
          r"$H_i^-=H_i\Gamma_{\boldsymbol{\alpha}}$", "Synthetic fault view"),
     ]
@@ -142,7 +142,7 @@ def draw_overview():
         label(ax, 431, y - 10, role, 7.7, MUTED)
     label(ax, 221, 122, r"SSA ratio $\Gamma_{\boldsymbol{\alpha}}$ evaluated at the nominal $4\,\Omega$ load.",
           8.0)
-    label(ax, 221, 108, "Standardize the real and imaginary parts of each view.", 8.0)
+    label(ax, 221, 108, "Positive perturbations act on standardized real and imaginary parts.", 8.0)
 
     panel(ax, 6, 89, "(c) Anomaly scoring and calibration", 510)
     block(ax, 6, 41, 73, 28, "Query spectrum", r"$\mathbf{X}$")
